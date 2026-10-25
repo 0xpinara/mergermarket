@@ -1,6 +1,7 @@
 """SQLite persistence. All statements are parameterized."""
 from __future__ import annotations
 
+import contextvars
 import json
 import secrets
 import sqlite3
@@ -176,6 +177,12 @@ CREATE TABLE IF NOT EXISTS release_receipts (
   created_at TEXT NOT NULL
 );
 
+-- Workspaces that already received the lived-in demo portfolio (so deleting every deal doesn't re-seed it).
+CREATE TABLE IF NOT EXISTS demo_seeds (
+  workspace TEXT PRIMARY KEY,
+  seeded_at TEXT NOT NULL
+);
+
 -- Per-workspace secret for privacy-shield tokens. Never leaves this server.
 CREATE TABLE IF NOT EXISTS pii_secrets (
   workspace TEXT PRIMARY KEY,
@@ -185,7 +192,14 @@ CREATE TABLE IF NOT EXISTS pii_secrets (
 """
 
 
+# Demo seeding replays a timeline; it sets this for its own request context only. None means real time.
+CLOCK: contextvars.ContextVar = contextvars.ContextVar("mergeproof_clock", default=None)
+
+
 def now() -> str:
+    clock = CLOCK.get()
+    if clock is not None:
+        return clock()
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
 
 

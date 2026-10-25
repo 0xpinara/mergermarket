@@ -885,6 +885,7 @@ export const api = {
   updateDeal: (id: string, body: Partial<Deal>) => req<Deal>("PATCH", `/deals/${id}`, body),
   deleteDeal: (id: string) => req<void>("DELETE", `/deals/${id}`),
   sample: (reset = false) => req<{ deal: Deal; created: boolean }>("POST", "/sample", { reset }),
+  seedDemo: () => req<{ seeded: boolean; deal_id: string | null }>("POST", "/demo/seed"),
   sampleFiles: () => req<{ side: Side | "messy"; name: string; bytes: number; rows: number }[]>("GET", "/sample/files"),
   upload: (dealId: string, side: Side, files: File[]) => {
     const fd = new FormData();

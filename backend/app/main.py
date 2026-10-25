@@ -13,7 +13,7 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
 
-from . import config, db, ingest, reports, services
+from . import config, db, demo_seed, ingest, reports, services
 from .deps import get_deal, workspace
 from .ai import embeddings
 from .engine import metrics, runner
@@ -307,8 +307,8 @@ def delete_deal(deal_id: str, ws: str = Depends(workspace)):
 def sample(body: SampleIn | None = None, ws: str = Depends(workspace)):
     body = body or SampleIn()
     with db.connect() as conn:
-        existing = conn.execute("SELECT id FROM deals WHERE workspace=? AND is_sample=1 ORDER BY created_at",
-                                (ws,)).fetchall()
+        existing = conn.execute("SELECT id FROM deals WHERE workspace=? AND is_sample=1 AND source_ref=? "
+                                "ORDER BY created_at", (ws, services.SAMPLE_DEAL["source_ref"])).fetchall()
         if existing and not body.reset:
             return {"deal": deal_view(conn, _deal(conn, existing[0]["id"], ws)), "created": False}
         for r in existing:
@@ -684,6 +684,13 @@ def intel_delete(iid: str, ws: str = Depends(workspace)):
         if not n:
             raise HTTPException(404, "Note not found.")
     return Response(status_code=204)
+
+
+@app.post("/api/demo/seed")
+def demo_seed_route(ws: str = Depends(workspace)):
+    """Give a brand-new workspace a lived-in, clearly synthetic demo portfolio. A no-op once a workspace has
+    any deal or has been seeded before."""
+    return demo_seed.seed(ws)
 
 
 # --------------------------------------------------------------------------- routes: integrate (plan → dry run → verify)

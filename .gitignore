@@ -16,3 +16,9 @@ frontend/dist/
 .vscode/
 .idea/
 smoke-shots/
+
+# Local secrets — never commit
+.env
+.env.*
+# Demo-video build output
+demo-build/

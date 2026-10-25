@@ -4374,3 +4374,16 @@ tr.bad td {
     gap: 14px;
   }
 }
+.seed-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 28px 0;
+  padding: 10px 14px;
+  border: 1px solid var(--ink-900);
+  border-radius: var(--r-lg);
+  background: var(--ink-900);
+  color: var(--lime);
+  font-family: var(--mono);
+  font-size: 12.5px;
+}

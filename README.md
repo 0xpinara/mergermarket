@@ -15,7 +15,7 @@ A person accepts every suggestion, and a ground-truth evaluation measures both t
 
 ```bash
 ./run.sh            # creates backend/.venv, installs deps, fetches the local AI model, builds the UI, serves :8000
-./run.sh test       # backend test suite (164 tests)
+./run.sh test       # backend test suite (165 tests)
 ./run.sh eval       # ground-truth evaluation over 30 randomized migrations -> backend/eval/results*.json
 ./run.sh mcp        # MCP server on stdio, so AI agents can run audits and read evidence
 MERGEPROOF_AI=off ./run.sh   # rules only, no model download
@@ -33,13 +33,21 @@ cd frontend && npm run dev          # http://localhost:5173, proxies /api to :80
 State lives in SQLite at `backend/data/mergeproof.db` (override with `MERGEPROOF_DB=/path/file.db`). It survives
 refreshes and restarts. Delete the file to reset.
 
-Browser smoke test (desktop + mobile, takes screenshots, exits non-zero on failure). It works against localhost or
-a public URL:
+Browser tests (desktop + mobile, screenshots, exit non-zero on failure). They work against localhost or a public
+URL:
 
 ```bash
 pip install playwright && python -m playwright install chromium
-python scripts/smoke_test.py http://127.0.0.1:8000
+python scripts/smoke_test.py http://127.0.0.1:8000        # the audit happy path, from an empty workspace
+python scripts/e2e_integrate.py http://127.0.0.1:8000     # plan → wrong key → dry run → fix → sign-off → verify → receipt
+python scripts/e2e_demo_seed.py http://127.0.0.1:8000     # first visit: every page populated by the demo portfolio
 ```
+
+Demo video (`scripts/demo_video/`, needs `pip install playwright imageio-ffmpeg pillow numpy` and an
+`ELEVENLABS_API_KEY` in the repo-root `.env`, which is gitignored): `narrate.py` (ElevenLabs narration with word
+timings) → `record.py` (a real Playwright walkthrough captured live over the DevTools screencast) → `compose.py`
+(1080p MP4 with synced narration, captions and subtle zooms) → `verify.py` (re-transcribes the result to check
+narration and sync).
 
 ---
 
@@ -72,6 +80,21 @@ python scripts/smoke_test.py http://127.0.0.1:8000
 Failure handling: an upload whose first row is data is rejected with a clear message. Binary files, empty files,
 header-only files, oversized files, files over the row limit, `.xls`, and other types are also rejected cleanly.
 Rerunning the audit never clones findings.
+
+**First visit: a lived-in demo portfolio.** A brand-new browser workspace is seeded automatically (about 5 s) so
+no page opens empty. Everything in it is fictional: companies, people, addresses, amounts, `example.com` e-mails,
+555-01xx phone numbers and `.example` websites. Every audit, plan, dry run, sign-off, receipt and review is produced
+by the real engine and API handlers, replayed along a plausible timeline (`app/demo_seed.py`):
+
+- **Cedar × Bayview** (the sample) — planned, the unit-key mistake caught and fixed in the dry run, signed off,
+  verified after the 9/30 cutover; reviewers are mid-way through the import-time findings.
+- **Cedar × Lakeshore Living** — an earlier migration whose consolidated export comes from the evaluation harness's
+  seeded perturbation. It is fully reviewed and released with a receipt.
+- **Cedar × Pinecrest Rentals** — an upcoming deal: legacy exports only, mapping plan half reviewed.
+- **Deal Intelligence** — seven fictional prospects across the pipeline, three linked to the deals above.
+
+It is seeded once per workspace (deleting every deal doesn't bring it back). To start empty, set
+`localStorage.mp.demoSeed = "off"` before the first load. The browser tests do this.
 
 ---
 
@@ -363,12 +386,13 @@ backend/app/
   engine/        canonical → matching → rules → runner (pure analyze()), metrics (live KPIs)
   integrate/     template · profile · mapping · transforms · plan · dryrun · readiness · export · api
   privacy.py     HMAC tokenization of tenant PII for agent-facing outputs
+  demo_seed.py   first-visit demo portfolio (fictional; real engine output on a replayed timeline)
   main.py        API + static frontend        reports.py  PDF / CSV / report JSON
   sample_data/   synthetic Cedar × Bayview exports + target_template/cedar_import_v1.json (fictional)
 backend/tests/   fixture, matching, ingest, normalizer and API tests
 frontend/src/    React + TypeScript; hand-built design system in styles.css
   art/dusk.ts    the hero's animated ASCII scene (halftone dots, ordered dither, palette-quantized; canvas)
 backend/eval/    ground-truth evaluation harness + latest results.json
-scripts/         browser smoke test
+scripts/         browser tests (smoke, Integrate journey, demo portfolio) · demo_video/ pipeline
 skills/          Agent Skill: migration-continuity-audit/SKILL.md
 ```

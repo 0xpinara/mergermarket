@@ -174,7 +174,8 @@ def load_sample_acquisition() -> str:
     Example: load_sample_acquisition() -> {"deal_id": "deal_…", "created": true}. Then call run_audit."""
     db.init()
     with db.connect() as conn:
-        row = conn.execute("SELECT id FROM deals WHERE workspace=? AND is_sample=1", (WORKSPACE,)).fetchone()
+        row = conn.execute("SELECT id FROM deals WHERE workspace=? AND is_sample=1 AND source_ref=?",
+                           (WORKSPACE, services.SAMPLE_DEAL["source_ref"])).fetchone()
         did = row["id"] if row else services.load_sample(conn, WORKSPACE)
     return json.dumps({"deal_id": did, "created": row is None, "next": "run_audit(deal_id)"})
 

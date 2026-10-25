@@ -1,0 +1,67 @@
+{
+ "voice": {
+  "name": "Sarah (ElevenLabs premade)",
+  "voice_id": "EXAVITQu4vr4xnSDxMaL",
+  "model_id": "eleven_multilingual_v2",
+  "settings": {
+   "stability": 0.42,
+   "similarity_boost": 0.82,
+   "style": 0.32,
+   "use_speaker_boost": true
+  }
+ },
+ "scenes": [
+  {
+   "id": "intro",
+   "text": "Every acquisition ends with a data migration, and almost nobody checks that the leases, rent, and deposits actually survived it. That's what MergeProof does."
+  },
+  {
+   "id": "deal",
+   "text": "Here's a fictional deal: Cedar is acquiring Bayview Rentals. A hundred and eighty-seven leases are about to change systems."
+  },
+  {
+   "id": "map",
+   "text": "First, MergeProof profiles Bayview's exports: keys, types, and which columns other files actually reference. Then it proposes a mapping onto Cedar's import template, with evidence for every column."
+  },
+  {
+   "id": "contested",
+   "text": "This one is contested. Cedar's key is called unit code, and Bayview has a unit code column. But it's a door code that nothing references. Let's make the rushed choice anyway."
+  },
+  {
+   "id": "dryrun",
+   "text": "Now the dry run. It simulates the import without touching anything. Four hundred and eighteen rows rejected: a hundred seventy-five active leases, three hundred eighty-seven thousand dollars a month, that would never bill."
+  },
+  {
+   "id": "fix",
+   "text": "So we reopen the evidence, and switch to the key the leases actually point at."
+  },
+  {
+   "id": "rerun",
+   "text": "Then we run it again."
+  },
+  {
+   "id": "fixed",
+   "text": "Zero rejected. Every dollar ties out, property by property."
+  },
+  {
+   "id": "signoff",
+   "text": "A named reviewer signs off on this exact plan."
+  },
+  {
+   "id": "verify",
+   "text": "After the real import, we verify Cedar's actual data, and the load introduced nineteen findings no plan could have predicted."
+  },
+  {
+   "id": "lease",
+   "text": "Like this one. Dana Whitfield's lease is active in Bayview, and simply missing in Cedar. That's twenty-two fifty a month, with the exact source row as proof."
+  },
+  {
+   "id": "money",
+   "text": "Theo's rent quietly dropped by four hundred and fifty dollars. And deposits, like Mina's eighteen hundred, are tracked separately, as liabilities. Totals hide this. Rows don't."
+  },
+  {
+   "id": "close",
+   "text": "MergeProof. Every record, accounted for."
+  }
+ ]
+}

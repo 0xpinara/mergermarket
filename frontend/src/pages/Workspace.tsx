@@ -367,8 +367,8 @@ export function Workspace() {
         <div className="banner info">
           <span className="ico">◇</span>
           <span className="grow">
-            <b>Synthetic sample loaded.</b> {deal.source_notes} Twelve exports are already in place below — run the audit
-            when you’re ready.
+            <b>Synthetic sample loaded.</b> {deal.source_notes} {deal.snapshots?.length ?? 0} exports are already in place
+            below{deal.snapshots?.some((x) => x.side === "after") ? " — run the audit when you’re ready." : "."}
           </span>
         </div>
       )}
