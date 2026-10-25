@@ -16,3 +16,10 @@ frontend/dist/
 .vscode/
 .idea/
 smoke-shots/
+.env
+.env.*
+*.env
+credentials.json
+*.pem
+*.key
+.credentials
