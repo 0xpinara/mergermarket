@@ -9,7 +9,7 @@ import { EvidenceDrawer } from "../components/EvidenceDrawer";
 import { useRouteDeal } from "./Workspace";
 
 type StatusFilter = "open" | "closed" | "all" | "gone";
-type MoneyFilter = "any" | "rent" | "deposit" | "money";
+type MoneyFilter = "any" | "rent" | "deposit" | "money" | "material";
 
 function Effect({ f }: { f: FindingRow }) {
   if (f.rent_counted_cents > 0 && (f.status === "open" || f.status === "investigating" || f.needs_rereview))
@@ -61,6 +61,7 @@ export function Findings() {
         if (moneyF === "rent" && !(f.rent_risk_cents > 0)) return false;
         if (moneyF === "deposit" && !(f.deposit_cents > 0)) return false;
         if (moneyF === "money" && !(f.rent_risk_cents || f.deposit_cents || f.pending_rent_cents)) return false;
+        if (moneyF === "material" && !f.material) return false;
         if (needle) {
           const hay = [f.title, f.subject, f.rule_id, f.id, f.explanation, f.source_ref?.id, f.target_ref?.id,
             f.source_ref?.file, f.target_ref?.file].join(" ").toLowerCase();
@@ -92,7 +93,7 @@ export function Findings() {
   if (!s?.has_run) {
     return (
       <div className="page">
-        <Kicker sec="03">Findings inbox</Kicker>
+        <Kicker sec="04">Findings inbox</Kicker>
         <Empty art={" ┌──────────┐\n │ ░░░░░░░░ │\n │ ░ no run │\n └──────────┘"} title="No audit run yet"
                actions={<Link className="btn primary" to={`/deals/${id}/workspace`}>Go to audit workspace</Link>}>
           Run the continuity audit to see what survived the move — and what didn’t.
@@ -105,7 +106,7 @@ export function Findings() {
     <div className="page">
       <div className="page-head">
         <div>
-          <Kicker sec="03">Findings inbox</Kicker>
+          <Kicker sec="04">Findings inbox</Kicker>
           <h1 className="page-title">
             {k!.findings_open ? <>{plural(k!.findings_open, "finding")} <em>to review</em></> : <>All findings <em>closed</em></>}
           </h1>
@@ -114,6 +115,12 @@ export function Findings() {
             <b className="mono" style={{ color: "var(--coral-ink)" }}>{money(k!.rent_at_risk_open)}/mo</b> · deposits{" "}
             <b className="mono" style={{ color: "var(--amber-ink)" }}>{money(k!.deposit_open)}</b> (separate) ·{" "}
             {k!.findings_closed} closed.
+            {s.materiality && (s.materiality.rent_cents !== null || s.materiality.deposit_cents !== null) && (
+              <> {k!.material_open ?? 0} open meet the deal’s materiality thresholds
+                ({s.materiality.rent_cents !== null ? `rent ≥ ${money(s.materiality.rent_cents)}/mo` : ""}
+                {s.materiality.rent_cents !== null && s.materiality.deposit_cents !== null ? ", " : ""}
+                {s.materiality.deposit_cents !== null ? `deposit ≥ ${money(s.materiality.deposit_cents)}` : ""}) — flags only.</>
+            )}
           </p>
         </div>
         <div className="btn-row">
@@ -171,6 +178,7 @@ export function Findings() {
           <option value="money">Has money at stake</option>
           <option value="rent">Rent at risk</option>
           <option value="deposit">Deposit discrepancy</option>
+          <option value="material">Material (meets thresholds)</option>
         </select>
         <select className="sel" aria-label="Rule" value={rule} onChange={(e) => setRule(e.target.value)}>
           <option value="all">All rules</option>
@@ -205,7 +213,8 @@ export function Findings() {
                     <td className="c-sev"><SevChip severity={f.severity} /></td>
                     <td>
                       <button className="row-title" onClick={(e) => { e.stopPropagation(); openDrawer(f.id); }}>{f.title}</button>
-                      <span className="rid">{f.rule_id} · {f.id}{f.confidence === "needs_review" ? " · needs review" : ""}</span>
+                      <span className="rid">{f.rule_id} · {f.id}{f.confidence === "needs_review" ? " · needs review" : ""}
+                        {f.material && <span className="mat" title={`Material: ${f.material_reason}. A flag only — nothing is hidden.`}> · material</span>}</span>
                     </td>
                     <td className="c-affected" style={{ maxWidth: 320 }}>{f.subject}</td>
                     <td className="num"><Effect f={f} /></td>

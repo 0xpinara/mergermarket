@@ -3,6 +3,7 @@ import { Shell } from "./components/Shell";
 import { Empty } from "./components/ui";
 import { CommandCenter } from "./pages/CommandCenter";
 import { Workspace } from "./pages/Workspace";
+import { Integrate } from "./pages/Integrate";
 import { Findings } from "./pages/Findings";
 import { Proof } from "./pages/Proof";
 import { Intel } from "./pages/Intel";
@@ -25,6 +26,7 @@ export function App() {
       <Routes>
         <Route path="/" element={<CommandCenter />} />
         <Route path="/deals/:id/workspace" element={<Workspace />} />
+        <Route path="/deals/:id/integrate" element={<Integrate />} />
         <Route path="/deals/:id/findings" element={<Findings />} />
         <Route path="/deals/:id/proof" element={<Proof />} />
         <Route path="/intel" element={<Intel />} />

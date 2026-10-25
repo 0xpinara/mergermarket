@@ -1,0 +1,1469 @@
+{
+ "generated_at": "2026-10-25T15:55:24Z",
+ "engine": "mp-recon 1.0.0",
+ "seeds": 30,
+ "dry_run_seeds": 10,
+ "clean": {
+  "tuning": {
+   "runs": 30,
+   "claims": 0,
+   "review_routed": 0,
+   "runs_without_any_finding": {
+    "k": 30,
+    "n": 30,
+    "p": 1.0,
+    "lo": 0.8865,
+    "hi": 1.0
+   },
+   "runs_with_a_false_claim": {
+    "k": 0,
+    "n": 30,
+    "p": 0.0,
+    "lo": 0.0,
+    "hi": 0.1135
+   },
+   "review_items_per_run": 0.0,
+   "by_rule": {},
+   "claim_examples": []
+  },
+  "holdout": {
+   "runs": 30,
+   "claims": 0,
+   "review_routed": 0,
+   "runs_without_any_finding": {
+    "k": 30,
+    "n": 30,
+    "p": 1.0,
+    "lo": 0.8865,
+    "hi": 1.0
+   },
+   "runs_with_a_false_claim": {
+    "k": 0,
+    "n": 30,
+    "p": 0.0,
+    "lo": 0.0,
+    "hi": 0.1135
+   },
+   "review_items_per_run": 0.0,
+   "by_rule": {},
+   "claim_examples": []
+  }
+ },
+ "scorecard": {
+  "tuning": {
+   "seeds": 30,
+   "first_seed": 1,
+   "recall": {
+    "k": 620,
+    "n": 635,
+    "p": 0.9764,
+    "lo": 0.9614,
+    "hi": 0.9856
+   },
+   "false_claims": 0,
+   "routed_to_review": 16,
+   "silently_missed": 0,
+   "rent_exact": {
+    "k": 30,
+    "n": 30,
+    "p": 1.0,
+    "lo": 0.8865,
+    "hi": 1.0
+   },
+   "deposit_exact": {
+    "k": 30,
+    "n": 30,
+    "p": 1.0,
+    "lo": 0.8865,
+    "hi": 1.0
+   },
+   "matching": {
+    "properties": {
+     "precision": 1.0,
+     "recall": 1.0,
+     "pairs": 240
+    },
+    "units": {
+     "precision": 1.0,
+     "recall": 1.0,
+     "pairs": 5580
+    },
+    "tenants": {
+     "precision": 1.0,
+     "recall": 0.9991,
+     "pairs": 5610
+    },
+    "leases": {
+     "precision": 1.0,
+     "recall": 0.9973,
+     "pairs": 5562
+    },
+    "maintenance": {
+     "precision": 1.0,
+     "recall": 1.0,
+     "pairs": 2041
+    }
+   },
+   "missed_examples": [],
+   "false_claim_examples": [],
+   "ai_work_orders": {
+    "rewrites": 44,
+    "top1": 0,
+    "any": 0,
+    "dropped": 45,
+    "spurious": 0
+   }
+  },
+  "holdout": {
+   "seeds": 30,
+   "first_seed": 1001,
+   "recall": {
+    "k": 617,
+    "n": 631,
+    "p": 0.9778,
+    "lo": 0.9631,
+    "hi": 0.9867
+   },
+   "false_claims": 0,
+   "routed_to_review": 16,
+   "silently_missed": 0,
+   "rent_exact": {
+    "k": 30,
+    "n": 30,
+    "p": 1.0,
+    "lo": 0.8865,
+    "hi": 1.0
+   },
+   "deposit_exact": {
+    "k": 30,
+    "n": 30,
+    "p": 1.0,
+    "lo": 0.8865,
+    "hi": 1.0
+   },
+   "matching": {
+    "properties": {
+     "precision": 1.0,
+     "recall": 1.0,
+     "pairs": 240
+    },
+    "units": {
+     "precision": 1.0,
+     "recall": 1.0,
+     "pairs": 5580
+    },
+    "tenants": {
+     "precision": 1.0,
+     "recall": 0.9986,
+     "pairs": 5610
+    },
+    "leases": {
+     "precision": 1.0,
+     "recall": 0.9975,
+     "pairs": 5564
+    },
+    "maintenance": {
+     "precision": 1.0,
+     "recall": 1.0,
+     "pairs": 2043
+    }
+   },
+   "missed_examples": [],
+   "false_claim_examples": [],
+   "ai_work_orders": {
+    "rewrites": 46,
+    "top1": 0,
+    "any": 0,
+    "dropped": 41,
+    "spurious": 0
+   }
+  },
+  "holdout_with_ai": {
+   "seeds": 30,
+   "first_seed": 1001,
+   "recall": {
+    "k": 617,
+    "n": 631,
+    "p": 0.9778,
+    "lo": 0.9631,
+    "hi": 0.9867
+   },
+   "false_claims": 0,
+   "routed_to_review": 16,
+   "silently_missed": 0,
+   "rent_exact": {
+    "k": 30,
+    "n": 30,
+    "p": 1.0,
+    "lo": 0.8865,
+    "hi": 1.0
+   },
+   "deposit_exact": {
+    "k": 30,
+    "n": 30,
+    "p": 1.0,
+    "lo": 0.8865,
+    "hi": 1.0
+   },
+   "matching": {
+    "properties": {
+     "precision": 1.0,
+     "recall": 1.0,
+     "pairs": 240
+    },
+    "units": {
+     "precision": 1.0,
+     "recall": 1.0,
+     "pairs": 5580
+    },
+    "tenants": {
+     "precision": 1.0,
+     "recall": 0.9986,
+     "pairs": 5610
+    },
+    "leases": {
+     "precision": 1.0,
+     "recall": 0.9975,
+     "pairs": 5564
+    },
+    "maintenance": {
+     "precision": 1.0,
+     "recall": 1.0,
+     "pairs": 2043
+    }
+   },
+   "missed_examples": [],
+   "false_claim_examples": [],
+   "ai_work_orders": {
+    "rewrites": 46,
+    "top1": 46,
+    "any": 46,
+    "dropped": 41,
+    "spurious": 0
+   }
+  }
+ },
+ "injection": {
+  "runs": 30,
+  "injected_cells": 11703,
+  "invariant": {
+   "k": 30,
+   "n": 30,
+   "p": 1.0,
+   "lo": 0.8865,
+   "hi": 1.0
+  },
+  "differences": []
+ },
+ "offsetting": {
+  "runs": 60,
+  "both_caught_while_totals_tie": {
+   "k": 60,
+   "n": 60,
+   "p": 1.0,
+   "lo": 0.9398,
+   "hi": 1.0
+  },
+  "failures": [],
+  "note": "AGG-2 (portfolio rent) passes by construction; only row-level checks can see the two errors."
+ },
+ "blank_zero": {
+  "runs": 60,
+  "all_semantics_hold": {
+   "k": 60,
+   "n": 60,
+   "p": 1.0,
+   "lo": 0.9398,
+   "hi": 1.0
+  },
+  "failures": []
+ },
+ "mapping": {
+  "rules_only": {
+   "seeds": 60,
+   "ai": false,
+   "audit_mapping": "as auto-suggested",
+   "variants_with_incomplete_audit_mapping": {
+    "k": 29,
+    "n": 60,
+    "p": 0.4833,
+    "lo": 0.3618,
+    "hi": 0.6069
+   },
+   "items": 1920,
+   "unsafe_auto_suggestions": {
+    "k": 0,
+    "n": 1743,
+    "p": 0.0,
+    "lo": 0.0,
+    "hi": 0.0022
+   },
+   "auto_precision": {
+    "k": 1743,
+    "n": 1743,
+    "p": 1.0,
+    "lo": 0.9978,
+    "hi": 1.0
+   },
+   "auto_coverage": {
+    "k": 1743,
+    "n": 1862,
+    "p": 0.9361,
+    "lo": 0.9241,
+    "hi": 0.9463
+   },
+   "review_rate": {
+    "k": 107,
+    "n": 1920,
+    "p": 0.0557,
+    "lo": 0.0463,
+    "hi": 0.0669
+   },
+   "top1_accuracy": {
+    "k": 1844,
+    "n": 1862,
+    "p": 0.9903,
+    "lo": 0.9848,
+    "hi": 0.9939
+   },
+   "truth_in_candidates": {
+    "k": 1850,
+    "n": 1862,
+    "p": 0.9936,
+    "lo": 0.9888,
+    "hi": 0.9963
+   },
+   "review_with_correct_top": {
+    "k": 101,
+    "n": 107,
+    "p": 0.9439,
+    "lo": 0.883,
+    "hi": 0.974
+   },
+   "absent_column_not_auto_filled": {
+    "k": 58,
+    "n": 58,
+    "p": 1.0,
+    "lo": 0.9379,
+    "hi": 1.0
+   },
+   "unmapped_but_mappable": 12,
+   "decoys": {
+    "exposed": 173,
+    "safe": {
+     "k": 173,
+     "n": 173,
+     "p": 1.0,
+     "lo": 0.9783,
+     "hi": 1.0
+    },
+    "auto_correct": {
+     "k": 150,
+     "n": 173,
+     "p": 0.8671,
+     "lo": 0.8084,
+     "hi": 0.9098
+    },
+    "decoy_chosen_as_top": {
+     "k": 6,
+     "n": 173,
+     "p": 0.0347,
+     "lo": 0.016,
+     "hi": 0.0736
+    },
+    "decoy_auto_suggested": 0
+   },
+   "status_counts": {
+    "suggested": 1743,
+    "needs_review": 107,
+    "unmapped": 70
+   },
+   "unsafe_examples": [],
+   "truth_not_offered_examples": [
+    {
+     "seed": 3,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "unmapped",
+     "top": []
+    },
+    {
+     "seed": 21,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "unmapped",
+     "top": []
+    },
+    {
+     "seed": 26,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "unmapped",
+     "top": []
+    },
+    {
+     "seed": 29,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "unmapped",
+     "top": []
+    },
+    {
+     "seed": 30,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "unmapped",
+     "top": []
+    },
+    {
+     "seed": 1003,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "unmapped",
+     "top": []
+    },
+    {
+     "seed": 1006,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "unmapped",
+     "top": []
+    },
+    {
+     "seed": 1011,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "unmapped",
+     "top": []
+    },
+    {
+     "seed": 1018,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "unmapped",
+     "top": []
+    },
+    {
+     "seed": 1019,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "unmapped",
+     "top": []
+    },
+    {
+     "seed": 1026,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "unmapped",
+     "top": []
+    },
+    {
+     "seed": 1030,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "unmapped",
+     "top": []
+    }
+   ],
+   "per_item": {
+    "leases.base_rent": {
+     "suggested:ok": 60
+    },
+    "leases.lease_code": {
+     "suggested:ok": 60
+    },
+    "leases.lease_end": {
+     "suggested:ok": 54,
+     "unmapped:ok": 6
+    },
+    "leases.lease_status": {
+     "suggested:ok": 60
+    },
+    "leases.move_in_date": {
+     "suggested:ok": 60
+    },
+    "leases.rent_frequency": {
+     "needs_review:ok": 60
+    },
+    "leases.resident_id": {
+     "suggested:ok": 60
+    },
+    "leases.unit_code": {
+     "suggested:ok": 54,
+     "needs_review:ok": 6
+    },
+    "properties.city": {
+     "suggested:ok": 54,
+     "unmapped:ok": 6
+    },
+    "properties.legacy_ref": {
+     "suggested:ok": 60
+    },
+    "properties.property_code": {
+     "suggested:ok": 60
+    },
+    "properties.property_name": {
+     "suggested:ok": 60
+    },
+    "properties.state": {
+     "suggested:ok": 52,
+     "unmapped:ok": 8
+    },
+    "properties.street_address": {
+     "suggested:ok": 60
+    },
+    "residents.email": {
+     "suggested:ok": 60
+    },
+    "residents.full_name": {
+     "suggested:ok": 60
+    },
+    "residents.phone": {
+     "suggested:ok": 53,
+     "unmapped:ok": 7
+    },
+    "residents.resident_id": {
+     "needs_review:ok": 11,
+     "suggested:ok": 49
+    },
+    "security_deposits.deposit_code": {
+     "suggested:ok": 60
+    },
+    "security_deposits.deposit_held": {
+     "suggested:ok": 60
+    },
+    "security_deposits.lease_code": {
+     "suggested:ok": 60
+    },
+    "units.bedrooms": {
+     "suggested:ok": 49,
+     "unmapped:ok": 11
+    },
+    "units.property_code": {
+     "suggested:ok": 60
+    },
+    "units.unit_code": {
+     "suggested:ok": 36,
+     "needs_review:ok": 18,
+     "needs_review:wrong": 6
+    },
+    "units.unit_number": {
+     "suggested:ok": 48,
+     "unmapped:wrong": 12
+    },
+    "work_orders.created_date": {
+     "suggested:ok": 51,
+     "unmapped:ok": 9
+    },
+    "work_orders.description": {
+     "suggested:ok": 60
+    },
+    "work_orders.priority": {
+     "suggested:ok": 49,
+     "unmapped:ok": 11
+    },
+    "work_orders.property_code": {
+     "suggested:ok": 60
+    },
+    "work_orders.status": {
+     "suggested:ok": 60
+    },
+    "work_orders.unit_code": {
+     "suggested:ok": 54,
+     "needs_review:ok": 6
+    },
+    "work_orders.work_order_code": {
+     "suggested:ok": 60
+    }
+   }
+  },
+  "rules_only_confirmed_legacy_mapping": {
+   "seeds": 60,
+   "ai": false,
+   "audit_mapping": "confirmed",
+   "variants_with_incomplete_audit_mapping": {
+    "k": 0,
+    "n": 60,
+    "p": 0.0,
+    "lo": 0.0,
+    "hi": 0.0602
+   },
+   "items": 1920,
+   "unsafe_auto_suggestions": {
+    "k": 0,
+    "n": 1788,
+    "p": 0.0,
+    "lo": 0.0,
+    "hi": 0.0021
+   },
+   "auto_precision": {
+    "k": 1788,
+    "n": 1788,
+    "p": 1.0,
+    "lo": 0.9979,
+    "hi": 1.0
+   },
+   "auto_coverage": {
+    "k": 1788,
+    "n": 1862,
+    "p": 0.9603,
+    "lo": 0.9504,
+    "hi": 0.9682
+   },
+   "review_rate": {
+    "k": 74,
+    "n": 1920,
+    "p": 0.0385,
+    "lo": 0.0308,
+    "hi": 0.0481
+   },
+   "top1_accuracy": {
+    "k": 1862,
+    "n": 1862,
+    "p": 1.0,
+    "lo": 0.9979,
+    "hi": 1.0
+   },
+   "truth_in_candidates": {
+    "k": 1862,
+    "n": 1862,
+    "p": 1.0,
+    "lo": 0.9979,
+    "hi": 1.0
+   },
+   "review_with_correct_top": {
+    "k": 74,
+    "n": 74,
+    "p": 1.0,
+    "lo": 0.9507,
+    "hi": 1.0
+   },
+   "absent_column_not_auto_filled": {
+    "k": 58,
+    "n": 58,
+    "p": 1.0,
+    "lo": 0.9379,
+    "hi": 1.0
+   },
+   "unmapped_but_mappable": 0,
+   "decoys": {
+    "exposed": 173,
+    "safe": {
+     "k": 173,
+     "n": 173,
+     "p": 1.0,
+     "lo": 0.9783,
+     "hi": 1.0
+    },
+    "auto_correct": {
+     "k": 159,
+     "n": 173,
+     "p": 0.9191,
+     "lo": 0.8688,
+     "hi": 0.9512
+    },
+    "decoy_chosen_as_top": {
+     "k": 0,
+     "n": 173,
+     "p": 0.0,
+     "lo": 0.0,
+     "hi": 0.0217
+    },
+    "decoy_auto_suggested": 0
+   },
+   "status_counts": {
+    "suggested": 1788,
+    "needs_review": 74,
+    "unmapped": 58
+   },
+   "unsafe_examples": [],
+   "truth_not_offered_examples": [],
+   "per_item": {
+    "leases.base_rent": {
+     "suggested:ok": 60
+    },
+    "leases.lease_code": {
+     "suggested:ok": 60
+    },
+    "leases.lease_end": {
+     "suggested:ok": 54,
+     "unmapped:ok": 6
+    },
+    "leases.lease_status": {
+     "suggested:ok": 60
+    },
+    "leases.move_in_date": {
+     "suggested:ok": 60
+    },
+    "leases.rent_frequency": {
+     "needs_review:ok": 60
+    },
+    "leases.resident_id": {
+     "suggested:ok": 60
+    },
+    "leases.unit_code": {
+     "suggested:ok": 60
+    },
+    "properties.city": {
+     "suggested:ok": 54,
+     "unmapped:ok": 6
+    },
+    "properties.legacy_ref": {
+     "suggested:ok": 60
+    },
+    "properties.property_code": {
+     "suggested:ok": 60
+    },
+    "properties.property_name": {
+     "suggested:ok": 60
+    },
+    "properties.state": {
+     "suggested:ok": 52,
+     "unmapped:ok": 8
+    },
+    "properties.street_address": {
+     "suggested:ok": 60
+    },
+    "residents.email": {
+     "suggested:ok": 60
+    },
+    "residents.full_name": {
+     "suggested:ok": 60
+    },
+    "residents.phone": {
+     "suggested:ok": 53,
+     "unmapped:ok": 7
+    },
+    "residents.resident_id": {
+     "suggested:ok": 60
+    },
+    "security_deposits.deposit_code": {
+     "suggested:ok": 60
+    },
+    "security_deposits.deposit_held": {
+     "suggested:ok": 60
+    },
+    "security_deposits.lease_code": {
+     "suggested:ok": 60
+    },
+    "units.bedrooms": {
+     "suggested:ok": 49,
+     "unmapped:ok": 11
+    },
+    "units.property_code": {
+     "suggested:ok": 60
+    },
+    "units.unit_code": {
+     "suggested:ok": 46,
+     "needs_review:ok": 14
+    },
+    "units.unit_number": {
+     "suggested:ok": 60
+    },
+    "work_orders.created_date": {
+     "suggested:ok": 51,
+     "unmapped:ok": 9
+    },
+    "work_orders.description": {
+     "suggested:ok": 60
+    },
+    "work_orders.priority": {
+     "suggested:ok": 49,
+     "unmapped:ok": 11
+    },
+    "work_orders.property_code": {
+     "suggested:ok": 60
+    },
+    "work_orders.status": {
+     "suggested:ok": 60
+    },
+    "work_orders.unit_code": {
+     "suggested:ok": 60
+    },
+    "work_orders.work_order_code": {
+     "suggested:ok": 60
+    }
+   }
+  },
+  "with_ai": {
+   "seeds": 60,
+   "ai": true,
+   "audit_mapping": "as auto-suggested",
+   "variants_with_incomplete_audit_mapping": {
+    "k": 29,
+    "n": 60,
+    "p": 0.4833,
+    "lo": 0.3618,
+    "hi": 0.6069
+   },
+   "items": 1920,
+   "unsafe_auto_suggestions": {
+    "k": 0,
+    "n": 1743,
+    "p": 0.0,
+    "lo": 0.0,
+    "hi": 0.0022
+   },
+   "auto_precision": {
+    "k": 1743,
+    "n": 1743,
+    "p": 1.0,
+    "lo": 0.9978,
+    "hi": 1.0
+   },
+   "auto_coverage": {
+    "k": 1743,
+    "n": 1862,
+    "p": 0.9361,
+    "lo": 0.9241,
+    "hi": 0.9463
+   },
+   "review_rate": {
+    "k": 124,
+    "n": 1920,
+    "p": 0.0646,
+    "lo": 0.0544,
+    "hi": 0.0765
+   },
+   "top1_accuracy": {
+    "k": 1844,
+    "n": 1862,
+    "p": 0.9903,
+    "lo": 0.9848,
+    "hi": 0.9939
+   },
+   "truth_in_candidates": {
+    "k": 1850,
+    "n": 1862,
+    "p": 0.9936,
+    "lo": 0.9888,
+    "hi": 0.9963
+   },
+   "review_with_correct_top": {
+    "k": 101,
+    "n": 124,
+    "p": 0.8145,
+    "lo": 0.737,
+    "hi": 0.8731
+   },
+   "absent_column_not_auto_filled": {
+    "k": 58,
+    "n": 58,
+    "p": 1.0,
+    "lo": 0.9379,
+    "hi": 1.0
+   },
+   "unmapped_but_mappable": 0,
+   "decoys": {
+    "exposed": 173,
+    "safe": {
+     "k": 173,
+     "n": 173,
+     "p": 1.0,
+     "lo": 0.9783,
+     "hi": 1.0
+    },
+    "auto_correct": {
+     "k": 150,
+     "n": 173,
+     "p": 0.8671,
+     "lo": 0.8084,
+     "hi": 0.9098
+    },
+    "decoy_chosen_as_top": {
+     "k": 6,
+     "n": 173,
+     "p": 0.0347,
+     "lo": 0.016,
+     "hi": 0.0736
+    },
+    "decoy_auto_suggested": 0
+   },
+   "status_counts": {
+    "suggested": 1743,
+    "needs_review": 124,
+    "unmapped": 53
+   },
+   "unsafe_examples": [],
+   "truth_not_offered_examples": [
+    {
+     "seed": 3,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "needs_review",
+     "top": [
+      "unit_code"
+     ]
+    },
+    {
+     "seed": 21,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "needs_review",
+     "top": [
+      "unit_code"
+     ]
+    },
+    {
+     "seed": 26,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "needs_review",
+     "top": [
+      "unit_code"
+     ]
+    },
+    {
+     "seed": 29,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "needs_review",
+     "top": [
+      "unit_code"
+     ]
+    },
+    {
+     "seed": 30,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "needs_review",
+     "top": [
+      "unit_id"
+     ]
+    },
+    {
+     "seed": 1003,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "needs_review",
+     "top": [
+      "Unit ID"
+     ]
+    },
+    {
+     "seed": 1006,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "needs_review",
+     "top": [
+      "Unit Ref"
+     ]
+    },
+    {
+     "seed": 1011,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "needs_review",
+     "top": [
+      "unit_code"
+     ]
+    },
+    {
+     "seed": 1018,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "needs_review",
+     "top": [
+      "Unit Key"
+     ]
+    },
+    {
+     "seed": 1019,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "needs_review",
+     "top": [
+      "Unit Key"
+     ]
+    },
+    {
+     "seed": 1026,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "needs_review",
+     "top": [
+      "unit_code"
+     ]
+    },
+    {
+     "seed": 1030,
+     "item": "units.unit_number",
+     "truth": [
+      "Apt No"
+     ],
+     "status": "needs_review",
+     "top": [
+      "unit_id"
+     ]
+    }
+   ],
+   "per_item": {
+    "leases.base_rent": {
+     "suggested:ok": 60
+    },
+    "leases.lease_code": {
+     "suggested:ok": 60
+    },
+    "leases.lease_end": {
+     "suggested:ok": 54,
+     "needs_review:wrong": 4,
+     "unmapped:ok": 2
+    },
+    "leases.lease_status": {
+     "suggested:ok": 60
+    },
+    "leases.move_in_date": {
+     "suggested:ok": 60
+    },
+    "leases.rent_frequency": {
+     "needs_review:ok": 60
+    },
+    "leases.resident_id": {
+     "suggested:ok": 60
+    },
+    "leases.unit_code": {
+     "suggested:ok": 54,
+     "needs_review:ok": 6
+    },
+    "properties.city": {
+     "suggested:ok": 54,
+     "unmapped:ok": 6
+    },
+    "properties.legacy_ref": {
+     "suggested:ok": 60
+    },
+    "properties.property_code": {
+     "suggested:ok": 60
+    },
+    "properties.property_name": {
+     "suggested:ok": 60
+    },
+    "properties.state": {
+     "suggested:ok": 52,
+     "unmapped:ok": 8
+    },
+    "properties.street_address": {
+     "suggested:ok": 60
+    },
+    "residents.email": {
+     "suggested:ok": 60
+    },
+    "residents.full_name": {
+     "suggested:ok": 60
+    },
+    "residents.phone": {
+     "suggested:ok": 53,
+     "unmapped:ok": 6,
+     "needs_review:wrong": 1
+    },
+    "residents.resident_id": {
+     "needs_review:ok": 11,
+     "suggested:ok": 49
+    },
+    "security_deposits.deposit_code": {
+     "suggested:ok": 60
+    },
+    "security_deposits.deposit_held": {
+     "suggested:ok": 60
+    },
+    "security_deposits.lease_code": {
+     "suggested:ok": 60
+    },
+    "units.bedrooms": {
+     "suggested:ok": 49,
+     "unmapped:ok": 11
+    },
+    "units.property_code": {
+     "suggested:ok": 60
+    },
+    "units.unit_code": {
+     "suggested:ok": 36,
+     "needs_review:ok": 18,
+     "needs_review:wrong": 6
+    },
+    "units.unit_number": {
+     "suggested:ok": 48,
+     "needs_review:wrong": 12
+    },
+    "work_orders.created_date": {
+     "suggested:ok": 51,
+     "unmapped:ok": 9
+    },
+    "work_orders.description": {
+     "suggested:ok": 60
+    },
+    "work_orders.priority": {
+     "suggested:ok": 49,
+     "unmapped:ok": 11
+    },
+    "work_orders.property_code": {
+     "suggested:ok": 60
+    },
+    "work_orders.status": {
+     "suggested:ok": 60
+    },
+    "work_orders.unit_code": {
+     "suggested:ok": 54,
+     "needs_review:ok": 6
+    },
+    "work_orders.work_order_code": {
+     "suggested:ok": 60
+    }
+   }
+  }
+ },
+ "dry_run": {
+  "seeds": 10,
+  "mistakes_tried": 140,
+  "baseline_clean": {
+   "k": 10,
+   "n": 10,
+   "p": 1.0,
+   "lo": 0.7225,
+   "hi": 1.0
+  },
+  "baselines_not_clean": [],
+  "gate_blocking_recall": {
+   "k": 120,
+   "n": 140,
+   "p": 0.8571,
+   "lo": 0.7896,
+   "hi": 0.9056
+  },
+  "surfaced_recall": {
+   "k": 120,
+   "n": 140,
+   "p": 0.8571,
+   "lo": 0.7896,
+   "hi": 0.9056
+  },
+  "by_mistake": {
+   "unit key from the door-code column": {
+    "gate_blocking": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "surfaced": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "refused_at_edit": 0,
+    "example": "418 rows rejected, tie-out AGG-1/AGG-2/AGG-4/AGG-5 fails, 367 predicted at medium or above"
+   },
+   "base rent from market rent": {
+    "gate_blocking": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "surfaced": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "refused_at_edit": 0,
+    "example": "tie-out AGG-2/AGG-3 fails, 175 predicted at medium or above"
+   },
+   "lease status: active mapped to Past": {
+    "gate_blocking": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "surfaced": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "refused_at_edit": 0,
+    "example": "tie-out AGG-1/AGG-2/AGG-3 fails, 175 predicted at medium or above"
+   },
+   "lease status: expired mapped to Current": {
+    "gate_blocking": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "surfaced": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "refused_at_edit": 0,
+    "example": "tie-out AGG-1/AGG-2 fails, 12 predicted at medium or above"
+   },
+   "move-in date from the signed date": {
+    "gate_blocking": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "surfaced": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "refused_at_edit": 0,
+    "example": "175 predicted at medium or above"
+   },
+   "move-in date from the end date": {
+    "gate_blocking": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "surfaced": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "refused_at_edit": 0,
+    "example": "175 predicted at medium or above"
+   },
+   "move-in date written DD/MM/YYYY": {
+    "gate_blocking": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "surfaced": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "refused_at_edit": 0,
+    "example": "158 predicted at medium or above"
+   },
+   "resident reference from the unit column": {
+    "gate_blocking": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "surfaced": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "refused_at_edit": 0,
+    "example": "347 rows rejected, tie-out AGG-1/AGG-2/AGG-4 fails, 335 predicted at medium or above"
+   },
+   "work-order status: open mapped to Closed": {
+    "gate_blocking": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "surfaced": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "refused_at_edit": 0,
+    "example": "tie-out AGG-5 fails, 16 predicted at medium or above"
+   },
+   "deposit held from the required-deposit column": {
+    "gate_blocking": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "surfaced": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "refused_at_edit": 0,
+    "example": "tie-out AGG-4 fails, 59 predicted at medium or above"
+   },
+   "unit number from the door code": {
+    "gate_blocking": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "surfaced": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "refused_at_edit": 0,
+    "example": "186 predicted at medium or above"
+   },
+   "property name from the street address": {
+    "gate_blocking": {
+     "k": 0,
+     "n": 10,
+     "p": 0.0,
+     "lo": 0.0,
+     "hi": 0.2775
+    },
+    "surfaced": {
+     "k": 0,
+     "n": 10,
+     "p": 0.0,
+     "lo": 0.0,
+     "hi": 0.2775
+    },
+    "refused_at_edit": 0,
+    "example": "nothing"
+   },
+   "resident email from the phone column": {
+    "gate_blocking": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "surfaced": {
+     "k": 10,
+     "n": 10,
+     "p": 1.0,
+     "lo": 0.7225,
+     "hi": 1.0
+    },
+    "refused_at_edit": 10,
+    "example": "refused at edit"
+   },
+   "rent frequency constant Weekly": {
+    "gate_blocking": {
+     "k": 0,
+     "n": 10,
+     "p": 0.0,
+     "lo": 0.0,
+     "hi": 0.2775
+    },
+    "surfaced": {
+     "k": 0,
+     "n": 10,
+     "p": 0.0,
+     "lo": 0.0,
+     "hi": 0.2775
+    },
+    "refused_at_edit": 0,
+    "example": "nothing"
+   }
+  },
+  "slipped": [
+   "property name from the street address",
+   "rent frequency constant Weekly"
+  ]
+ },
+ "stale": {
+  "export_allowed_when_signed_and_current": true,
+  "refused": {
+   "never signed": true,
+   "column ignored after sign-off": true,
+   "column reopened after sign-off": true,
+   "suggestion rejected after sign-off": true,
+   "plan edited and dry run re-run, not re-signed": true,
+   "sign-off revoked": true,
+   "legacy export changed after sign-off": true,
+   "new dry run of the same plan, not re-signed": true
+  },
+  "all_refused": true
+ },
+ "seconds": 199.0,
+ "ai_status": {
+  "enabled": true,
+  "available": true,
+  "model": "minishlab/potion-retrieval-32M",
+  "dim": 512,
+  "load_ms": 439,
+  "local": true,
+  "reason": null
+ }
+}

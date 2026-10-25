@@ -125,7 +125,7 @@ export function Intel() {
     <div className="page">
       <div className="page-head">
         <div>
-          <Kicker sec="05">Deal intelligence</Kicker>
+          <Kicker sec="06">Deal intelligence</Kicker>
           <h1 className="page-title">Who just <em>bought</em> whom?</h1>
           <p className="page-sub">
             A lightweight list of prospective integrations — property managers that recently acquired a portfolio or

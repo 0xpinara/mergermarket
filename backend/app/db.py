@@ -123,6 +123,65 @@ CREATE TABLE IF NOT EXISTS intel_notes (
   created_at TEXT NOT NULL, updated_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS intel_ws ON intel_notes(workspace, updated_at);
+
+-- Integration planning (additive): plan -> dry runs -> sign-off -> release receipt.
+CREATE TABLE IF NOT EXISTS integration_plans (
+  id TEXT PRIMARY KEY,
+  deal_id TEXT NOT NULL UNIQUE REFERENCES deals(id) ON DELETE CASCADE,
+  template_id TEXT NOT NULL, template_version TEXT NOT NULL,
+  template_json TEXT NOT NULL,
+  version INTEGER NOT NULL DEFAULT 1,
+  contract_fp TEXT NOT NULL,
+  tables_json TEXT NOT NULL,
+  items_json TEXT NOT NULL,
+  plan_hash TEXT NOT NULL,
+  created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS integration_events (
+  id TEXT PRIMARY KEY,
+  plan_id TEXT NOT NULL REFERENCES integration_plans(id) ON DELETE CASCADE,
+  deal_id TEXT NOT NULL,
+  version INTEGER NOT NULL,
+  actor TEXT NOT NULL, action TEXT NOT NULL, item_id TEXT, note TEXT,
+  before_json TEXT, after_json TEXT, plan_hash TEXT,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS integ_events_deal ON integration_events(deal_id, created_at);
+
+CREATE TABLE IF NOT EXISTS dry_runs (
+  id TEXT PRIMARY KEY,
+  deal_id TEXT NOT NULL REFERENCES deals(id) ON DELETE CASCADE,
+  plan_id TEXT NOT NULL, plan_version INTEGER NOT NULL, plan_hash TEXT NOT NULL, contract_fp TEXT NOT NULL,
+  output_hash TEXT NOT NULL,
+  summary_json TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS dry_runs_deal ON dry_runs(deal_id, created_at);
+
+CREATE TABLE IF NOT EXISTS signoffs (
+  id TEXT PRIMARY KEY,
+  deal_id TEXT NOT NULL REFERENCES deals(id) ON DELETE CASCADE,
+  plan_hash TEXT NOT NULL, dry_run_id TEXT NOT NULL,
+  reviewer TEXT NOT NULL, statement TEXT NOT NULL,
+  created_at TEXT NOT NULL, revoked_at TEXT, revoked_by TEXT
+);
+CREATE INDEX IF NOT EXISTS signoffs_deal ON signoffs(deal_id, created_at);
+
+CREATE TABLE IF NOT EXISTS release_receipts (
+  id TEXT PRIMARY KEY,
+  deal_id TEXT NOT NULL REFERENCES deals(id) ON DELETE CASCADE,
+  sha256 TEXT NOT NULL,
+  receipt_json TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+
+-- Per-workspace secret for privacy-shield tokens. Never leaves this server.
+CREATE TABLE IF NOT EXISTS pii_secrets (
+  workspace TEXT PRIMARY KEY,
+  secret TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
 """
 
 
@@ -134,12 +193,23 @@ def new_id(prefix: str) -> str:
     return f"{prefix}_{secrets.token_hex(6)}"
 
 
+# Additive column migrations: (table, column, declaration). Never drops or rewrites existing data.
+COLUMNS = [
+    ("deals", "materiality_rent_cents", "INTEGER"),
+    ("deals", "materiality_deposit_cents", "INTEGER"),
+]
+
+
 def init() -> None:
     config.DATA_DIR.mkdir(parents=True, exist_ok=True)
     config.DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     with connect() as conn:
         conn.execute("PRAGMA journal_mode=WAL")
         conn.executescript(SCHEMA)
+        for table, col, decl in COLUMNS:
+            have = {r["name"] for r in conn.execute(f"PRAGMA table_info({table})")}
+            if col not in have:
+                conn.execute(f"ALTER TABLE {table} ADD COLUMN {col} {decl}")
 
 
 @contextmanager

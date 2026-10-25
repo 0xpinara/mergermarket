@@ -8,14 +8,16 @@ from contextlib import asynccontextmanager
 from datetime import date
 from typing import Literal
 
-from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, Query, Request, UploadFile
+from fastapi import Depends, FastAPI, File, Form, HTTPException, Query, Request, UploadFile
 from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
 
 from . import config, db, ingest, reports, services
+from .deps import get_deal, workspace
 from .ai import embeddings
 from .engine import metrics, runner
+from .integrate import api as integrate_api
 from .schema import ENTITIES, schema_payload
 
 log = logging.getLogger("mergeproof")
@@ -30,8 +32,6 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(title="MergeProof", version="1.0.0", docs_url="/api/docs", openapi_url="/api/openapi.json",
               lifespan=lifespan)
-
-_WS_RE = re.compile(r"^[A-Za-z0-9_-]{8,64}$")
 
 
 @app.middleware("http")
@@ -49,18 +49,7 @@ async def _headers(request: Request, call_next):
     return response
 
 
-def workspace(x_workspace: str | None = Header(default=None), ws: str | None = Query(default=None)) -> str:
-    w = x_workspace or ws
-    if not w or not _WS_RE.match(w):
-        raise HTTPException(400, "Missing or invalid workspace id.")
-    return w
-
-
-def _deal(conn, deal_id: str, ws: str) -> dict:
-    row = conn.execute("SELECT * FROM deals WHERE id=? AND workspace=?", (deal_id, ws)).fetchone()
-    if row is None:
-        raise HTTPException(404, "Audit workspace not found.")
-    return dict(row)
+_deal = get_deal
 
 
 def _snapshot(conn, sid: str, ws: str) -> tuple[dict, dict]:
@@ -119,6 +108,8 @@ class DealIn(BaseModel):
     new_system: str | None = Field(default=None, max_length=120)
     source_notes: str | None = Field(default=None, max_length=2000)
     source_ref: str | None = Field(default=None, max_length=500)
+    materiality_rent_cents: int | None = Field(default=None, ge=0, le=10**11)
+    materiality_deposit_cents: int | None = Field(default=None, ge=0, le=10**11)
 
     @field_validator("deal_date")
     @classmethod
@@ -211,7 +202,8 @@ def deal_status(conn, deal: dict) -> dict:
 
 def deal_view(conn, deal: dict, with_snapshots: bool = True) -> dict:
     out = {k: deal[k] for k in ("id", "title", "industry", "acquirer", "target_business", "deal_date", "old_system",
-                                "new_system", "source_notes", "source_ref", "created_at", "updated_at")}
+                                "new_system", "source_notes", "source_ref", "created_at", "updated_at",
+                                "materiality_rent_cents", "materiality_deposit_cents")}
     out["is_sample"] = bool(deal["is_sample"])
     out["status"] = deal_status(conn, deal)
     if with_snapshots:
@@ -290,9 +282,10 @@ def get_deal(deal_id: str, ws: str = Depends(workspace)):
 def patch_deal(deal_id: str, body: DealPatch, ws: str = Depends(workspace)):
     with db.connect() as conn:
         _deal(conn, deal_id, ws)
-        data = body.model_dump(exclude_unset=True)
-        data = {k: (v.strip() if isinstance(v, str) else v) or None for k, v in data.items()
+        raw = body.model_dump(exclude_unset=True)
+        data = {k: (v.strip() if isinstance(v, str) else v) or None for k, v in raw.items()
                 if k in services.DEAL_FIELDS}
+        data.update({k: raw[k] for k in services.MATERIALITY_FIELDS if k in raw})  # 0 is a valid threshold
         if "title" in data and not data["title"]:
             raise HTTPException(422, "Title can't be empty.")
         if data:
@@ -468,7 +461,8 @@ def findings(deal_id: str, include_inactive: bool = False, ws: str = Depends(wor
         _deal(conn, deal_id, ws)
         fs = metrics.load_findings(conn, deal_id, include_inactive=True)
         _, _, counted = metrics.attribute_rent([f for f in fs if f["active"]])
-        rows = [metrics.finding_row(f, counted) for f in fs if include_inactive or f["active"]]
+        deal = _deal(conn, deal_id, ws)
+        rows = [metrics.finding_row(f, counted, deal) for f in fs if include_inactive or f["active"]]
         rows.sort(key=lambda r: (not r["active"], metrics.SEVERITY_ORDER.get(r["severity"], 9),
                                  -(r["rent_risk_cents"] + r["deposit_cents"] + r["pending_rent_cents"]),
                                  r["rule_id"], r["subject"]))
@@ -499,7 +493,7 @@ def finding(fid: str, ws: str = Depends(workspace)):
         override = conn.execute("SELECT target_key, reviewer, created_at FROM match_overrides WHERE finding_id=? "
                                 "AND revoked_at IS NULL ORDER BY created_at DESC LIMIT 1", (fid,)).fetchone()
         return {
-            **metrics.finding_row(f, counted), "payload": p, "events": events, "related": related,
+            **metrics.finding_row(f, counted, deal), "payload": p, "events": events, "related": related,
             "rule": RULES.get(f["rule_id"]), "labels": runner.labels_for(deal), "deal_id": deal["id"],
             "override": dict(override) if override else None, "first_run_id": f["first_run_id"],
             "last_run_id": f["last_run_id"], "created_at": f["created_at"],
@@ -690,6 +684,11 @@ def intel_delete(iid: str, ws: str = Depends(workspace)):
         if not n:
             raise HTTPException(404, "Note not found.")
     return Response(status_code=204)
+
+
+# --------------------------------------------------------------------------- routes: integrate (plan → dry run → verify)
+
+app.include_router(integrate_api.router)
 
 
 # --------------------------------------------------------------------------- static frontend

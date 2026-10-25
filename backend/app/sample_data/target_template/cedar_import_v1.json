@@ -1,0 +1,85 @@
+{
+  "id": "cedar-import-v1",
+  "name": "Cedar consolidated platform — import template",
+  "version": "2026.10",
+  "synthetic": true,
+  "currency": "USD",
+  "notes": "Fictional import template for the Cedar × Bayview demonstration. Column bindings point at MergeProof's canonical property-management fields.",
+  "tables": [
+    {
+      "name": "properties", "entity": "properties", "file": "cedar_import_properties.csv",
+      "key": "property_code", "key_prefix": "CPR-",
+      "columns": [
+        {"name": "property_code", "canonical": "property_id", "type": "key", "required": true},
+        {"name": "property_name", "canonical": "name", "type": "text", "required": true, "max_length": 80},
+        {"name": "street_address", "canonical": "address", "type": "text", "required": true, "max_length": 120},
+        {"name": "city", "canonical": "city", "type": "text"},
+        {"name": "state", "canonical": "state", "type": "text", "max_length": 2},
+        {"name": "legacy_ref", "canonical": "legacy_ref", "type": "text",
+         "description": "The source system's own ID, kept for traceability."}
+      ]
+    },
+    {
+      "name": "units", "entity": "units", "file": "cedar_import_units.csv",
+      "key": "unit_code", "key_prefix": "CU-",
+      "columns": [
+        {"name": "unit_code", "canonical": "unit_id", "type": "key", "required": true},
+        {"name": "property_code", "canonical": "property_id", "type": "ref", "ref": "properties", "required": true},
+        {"name": "unit_number", "canonical": "unit_label", "type": "unit", "required": true, "max_length": 12},
+        {"name": "bedrooms", "canonical": "bedrooms", "type": "int"}
+      ]
+    },
+    {
+      "name": "residents", "entity": "tenants", "file": "cedar_import_residents.csv",
+      "key": "resident_id", "key_prefix": "CR-",
+      "columns": [
+        {"name": "resident_id", "canonical": "tenant_id", "type": "key", "required": true},
+        {"name": "full_name", "canonical": "full_name", "type": "name", "required": true, "max_length": 80},
+        {"name": "email", "canonical": "email", "type": "email"},
+        {"name": "phone", "canonical": "phone", "type": "phone"}
+      ]
+    },
+    {
+      "name": "leases", "entity": "leases", "file": "cedar_import_leases.csv",
+      "key": "lease_code", "key_prefix": "CL-",
+      "columns": [
+        {"name": "lease_code", "canonical": "lease_id", "type": "key", "required": true},
+        {"name": "resident_id", "canonical": "tenant_id", "type": "ref", "ref": "residents", "required": true},
+        {"name": "unit_code", "canonical": "unit_id", "type": "ref", "ref": "units", "required": true},
+        {"name": "move_in_date", "canonical": "start_date", "type": "date", "format": "MM/DD/YYYY", "required": true},
+        {"name": "lease_end", "canonical": "end_date", "type": "date", "format": "MM/DD/YYYY"},
+        {"name": "lease_status", "canonical": "status", "type": "enum", "vocabulary": "lease_status",
+         "required": true, "financial": true,
+         "values": {"Current": "active", "Past": "expired", "Cancelled": "cancelled", "Future": "future"}},
+        {"name": "base_rent", "canonical": "monthly_rent", "type": "money", "required": true, "financial": true},
+        {"name": "rent_frequency", "canonical": null, "type": "enum", "required": true,
+         "values": {"Monthly": null, "Weekly": null}, "suggest_constant": "Monthly",
+         "description": "How often rent is billed. Bayview's export has no equivalent column."}
+      ]
+    },
+    {
+      "name": "security_deposits", "entity": "deposits", "file": "cedar_import_security_deposits.csv",
+      "key": "deposit_code", "key_prefix": "CD-",
+      "columns": [
+        {"name": "deposit_code", "canonical": "deposit_id", "type": "key", "required": true},
+        {"name": "lease_code", "canonical": "lease_id", "type": "ref", "ref": "leases", "required": true},
+        {"name": "deposit_held", "canonical": "balance", "type": "money", "required": true, "financial": true}
+      ]
+    },
+    {
+      "name": "work_orders", "entity": "maintenance", "file": "cedar_import_work_orders.csv",
+      "key": "work_order_code", "key_prefix": "CW-",
+      "columns": [
+        {"name": "work_order_code", "canonical": "ticket_id", "type": "key", "required": true},
+        {"name": "property_code", "canonical": "property_id", "type": "ref", "ref": "properties", "required": true},
+        {"name": "unit_code", "canonical": "unit_id", "type": "ref", "ref": "units"},
+        {"name": "description", "canonical": "summary", "type": "text", "max_length": 120},
+        {"name": "priority", "canonical": "priority", "type": "enum", "vocabulary": "priority",
+         "values": {"Emergency": "urgent", "High": "high", "Medium": "medium", "Low": "low"}},
+        {"name": "status", "canonical": "status", "type": "enum", "vocabulary": "ticket_status", "required": true,
+         "values": {"New": "open", "In Progress": "in_progress", "Closed": "closed", "Cancelled": "cancelled"}},
+        {"name": "created_date", "canonical": "opened_date", "type": "date", "format": "MM/DD/YYYY"}
+      ]
+    }
+  ]
+}

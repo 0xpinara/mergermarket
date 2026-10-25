@@ -12,6 +12,7 @@ import { AsciiScene } from "../components/AsciiScene";
 import { dusk } from "../art/dusk";
 import { DealForm } from "../components/DealForm";
 import { useSampleLoader } from "../components/Shell";
+import { ReleaseTrack } from "../components/integrate/ReleaseTrack";
 
 function ScoreGauge({ s }: { s: Summary }) {
   const c = s.continuity!;
@@ -353,6 +354,8 @@ export function CommandCenter() {
           )}
         </div>
       </section>
+
+      {deal && <div className="section"><ReleaseTrack dealId={deal.id} summary={hasRun ? s : undefined} /></div>}
 
       {deal && !hasRun && (
         <div className="section grid cols-2" style={{ alignItems: "start" }}>

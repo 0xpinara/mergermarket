@@ -1,8 +1,9 @@
 {
- "generated_at": "2026-10-25T14:04:23Z",
+ "generated_at": "2026-10-25T15:55:23Z",
  "engine": "mp-recon 1.0.0",
  "rules_only": {
   "seeds": 30,
+  "first_seed": 1,
   "ai_model": null,
   "anomalies": {
    "injected": 635,
@@ -10,7 +11,7 @@
    "recall": 0.9764,
    "false_alarms": 0,
    "precision": 1.0,
-   "routed_to_review": 33,
+   "routed_to_review": 16,
    "missed_but_flagged_for_review": 15,
    "silently_missed": 0,
    "missed_examples": [],
@@ -29,7 +30,7 @@
    },
    "tenants": {
     "precision": 1.0,
-    "recall": 0.9955,
+    "recall": 0.9991,
     "pairs": 5610
    },
    "leases": {
@@ -56,10 +57,11 @@
    "dropped": 45,
    "spurious": 0
   },
-  "ms_per_audit": 112.4
+  "ms_per_audit": 112.1
  },
  "with_ai": {
   "seeds": 30,
+  "first_seed": 1,
   "ai_model": "minishlab/potion-retrieval-32M",
   "anomalies": {
    "injected": 635,
@@ -67,7 +69,7 @@
    "recall": 0.9764,
    "false_alarms": 0,
    "precision": 1.0,
-   "routed_to_review": 33,
+   "routed_to_review": 16,
    "missed_but_flagged_for_review": 15,
    "silently_missed": 0,
    "missed_examples": [],
@@ -86,7 +88,7 @@
    },
    "tenants": {
     "precision": 1.0,
-    "recall": 0.9955,
+    "recall": 0.9991,
     "pairs": 5610
    },
    "leases": {
@@ -113,14 +115,14 @@
    "dropped": 45,
    "spurious": 1
   },
-  "ms_per_audit": 137.0
+  "ms_per_audit": 113.8
  },
  "ai_status": {
   "enabled": true,
   "available": true,
   "model": "minishlab/potion-retrieval-32M",
   "dim": 512,
-  "load_ms": 914,
+  "load_ms": 864,
   "local": true,
   "reason": null
  },

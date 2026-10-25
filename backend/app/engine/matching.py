@@ -590,18 +590,30 @@ def match_leases(S: Side, T: Side, units: Result, tenants: Result, overrides: di
     return assign("leases", pairs, list(S.leases), list(T.leases), overrides)
 
 
+def name_similarity(a: str, b: str) -> float:
+    """Typo-tolerant person-name similarity (0-100). Token sorting handles "Last, First" order, but a typo can
+    reorder the sorted tokens ("vera valdivia" / "vera vladivia" sort differently and score 62), so take the
+    better of the plain and token-sorted ratios."""
+    return max(fuzz.ratio(a, b), fuzz.token_sort_ratio(a, b))
+
+
 def corroborate_tenants(S: Side, T: Side, tenants: Result, leases: Result) -> int:
     """Second pass: accept a tenant pair the contact details couldn't settle (blank email/phone) when the
     names agree and the tenant holds the lease that matched on unit, dates and rent. Returns pairs added."""
     added = 0
+    dup_targets = {q.t for qs in tenants.duplicates.values() for q in qs}
     for s_lease, m in sorted(leases.matches.items()):
         st, tt = S.lease_tenant.get(s_lease), T.lease_tenant.get(m.t)
-        if not st or not tt or st in tenants.matches or tt in tenants.reverse or tt in tenants.claimed:
+        if not st or not tt or st in tenants.matches or tt in tenants.reverse or tt in dup_targets:
+            continue
+        # A target that is only "claimed" as this same tenant's own review candidate is exactly the case this
+        # pass exists for; one that another legacy tenant is also a candidate for is left to the reviewer.
+        if any(c["pair"].t == tt for s2, cs in tenants.review.items() if s2 != st for c in cs):
             continue
         sn, tn = S.tenants[st].n.get("name"), T.tenants[tt].n.get("name")
         if not sn or not tn:
             continue
-        ratio = fuzz.token_sort_ratio(sn, tn)
+        ratio = name_similarity(sn, tn)
         if ratio < 90:
             continue
         reasons = [["Same name" if sn == tn else f"Very similar name ({ratio:.0f}%)", 20],

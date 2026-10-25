@@ -138,7 +138,9 @@ def _cents(v: str) -> int:
     return nz.parse_money(v) or 0
 
 
-def perturb(seed: int, before: dict[str, list[dict]], hard: bool = True) -> tuple[dict[str, list[dict]], dict]:
+def perturb(seed: int, before: dict[str, list[dict]], hard: bool = True,
+            anomalies: bool = True) -> tuple[dict[str, list[dict]], dict]:
+    """anomalies=False gives a *clean* migration: the same re-keying and format noise, nothing injected."""
     rng = random.Random(seed)
     B = {k: [dict(r) for r in v] for k, v in before.items()}
     pid = {r["property_id"]: f"EV-P{seed}-{i:02d}" for i, r in enumerate(rng.sample(B["properties"], len(B["properties"])))}
@@ -162,7 +164,7 @@ def perturb(seed: int, before: dict[str, list[dict]], hard: bool = True) -> tupl
 
     plan: dict[str, list[dict]] = {a: [] for a in ANOMALIES}
     for a in ANOMALIES:
-        n = rng.randint(1, 2)
+        n = rng.randint(1, 2) if anomalies else 0
         for _ in range(n):
             if a in ("drop_open_ticket", "close_open_ticket", "rewrite_ticket"):
                 if open_tickets:
@@ -423,11 +425,12 @@ def header_bench(ai) -> dict:
     return {"summary": tally, "rows": rows}
 
 
-def evaluate(seeds: int, use_ai: bool) -> dict:
+def evaluate(seeds: int, use_ai: bool, start: int = 1) -> dict:
+    """Seeds start..start+seeds-1. Seeds 1-30 were used while developing the engine; 1001+ are a holdout."""
     before = load_before()
     ai = embeddings.get() if use_ai else None
     runs = []
-    for seed in range(1, seeds + 1):
+    for seed in range(start, start + seeds):
         after, truth = perturb(seed, before)
         runs.append(score(truth, run_engine(before, after, ai)))
     exp = sum(r["expected"] for r in runs)
@@ -444,7 +447,7 @@ def evaluate(seeds: int, use_ai: bool) -> dict:
                              "recall": round(tp / should, 4) if should else None, "pairs": should}
     ai_tot = {k: sum(r["ai"][k] for r in runs) for k in runs[0]["ai"]}
     return {
-        "seeds": seeds, "ai_model": ai.model_id if ai else None,
+        "seeds": seeds, "first_seed": start, "ai_model": ai.model_id if ai else None,
         "anomalies": {"injected": exp, "detected": hit, "recall": round(hit / exp, 4) if exp else None,
                       "false_alarms": fa, "precision": round(hit / (hit + fa), 4) if hit + fa else None,
                       "routed_to_review": routed, "missed_but_flagged_for_review": missed_review,

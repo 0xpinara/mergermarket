@@ -13,12 +13,10 @@ from __future__ import annotations
 
 from collections import defaultdict
 
-from rapidfuzz import fuzz
-
 from .. import normalize as nz
 from ..ai import assist
 from .canonical import Rec, display_name
-from .matching import TH, Result, Side, same_tenant_ref, same_unit
+from .matching import TH, Result, Side, name_similarity, same_tenant_ref, same_unit
 
 RULES: dict[str, dict] = {
     "L-001": {"name": "Missing lease", "entity": "leases", "severity": "critical",
@@ -61,6 +59,8 @@ RULES: dict[str, dict] = {
               "check": "Held deposit balances match to the cent."},
     "D-004": {"name": "Deposit not linked to a lease", "entity": "deposits", "severity": "medium",
               "check": "Every deposit row references a lease or tenant that can be found."},
+    "D-005": {"name": "Deposit balance blank (not zero)", "entity": "deposits", "severity": "high",
+              "check": "A blank deposit balance is unknown, never zero: it is flagged on either side, not netted."},
     "D-003": {"name": "Deposit with no legacy record", "entity": "deposits", "severity": "low",
               "check": "Deposits in the consolidated system trace back to the legacy ledger."},
     "M-001": {"name": "Open work order missing", "entity": "maintenance", "severity": "high",
@@ -403,8 +403,8 @@ def lease_rules(c: Ctx) -> None:
                                        f"which does not exist in {L['new']}'s tenant list."),
                           action="Attach the lease to the correct tenant record.")
                 elif sc["tenant_key"] and tt and tt not in exp_ten and (
-                        exp_ten or fuzz.token_sort_ratio(S.tenants[sc["tenant_key"]].n.get("name") or "",
-                                                         T.tenants[tt].n.get("name") or "") < 80):
+                        exp_ten or name_similarity(S.tenants[sc["tenant_key"]].n.get("name") or "",
+                                                   T.tenants[tt].n.get("name") or "") < 80):
                     # Claim a different leaseholder only on contrary evidence: the legacy tenant matched someone
                     # else, or the names clearly differ. Unverifiable contact details alone are not a finding.
                     c.add("L-008", s.key, subject=subject, **common,
@@ -678,10 +678,33 @@ def deposit_rules(c: Ctx) -> None:
         ]
         return rows
 
+    def blank_balance(d: Rec) -> bool:
+        return "balance" in d.f and nz.blank(d.f.get("balance"))
+
     matched_src_tgt = set()
     for lk, deps in sorted(src_by_lease.items()):
         total = sum(d.n.get("balance") or 0 for d in deps)
         if total <= 0:
+            unknown = [d for d in deps if blank_balance(d)]
+            if unknown and lk in ML.matches:
+                matched_src_tgt.add(ML.matches[lk].t)
+            if unknown:
+                s_lease = S.leases[lk]
+                sc = _lease_ctx(S, lk)
+                t_key = ML.matches[lk].t if lk in ML.matches else None
+                tdeps = tgt_by_lease.get(t_key, []) if t_key else []
+                ttotal = sum(d.n.get("balance") or 0 for d in tdeps)
+                after = (f"{L['new']} shows {_money(ttotal)} for it" if tdeps and not all(map(blank_balance, tdeps))
+                         else f"{L['new']} has no amount either")
+                c.add("D-005", f"before:{lk}", subject=_subject(sc["tenant"], sc["unit"]),
+                      source=ev(unknown[0], {"tenant": sc["tenant"], "unit": sc["unit"], "lease": s_lease.id}),
+                      target=ev(tdeps[0], {"lease": T.leases[t_key].id}) if tdeps else None,
+                      compare=dcompare(deps, tdeps, s_lease.id, T.leases[t_key].id if t_key else None),
+                      keys=_keys(c, lease_key=lk), severity="medium",
+                      explanation=(f"The deposit row for lease {s_lease.id} in {L['old']} has a blank balance. Blank is "
+                                   f"not zero: the amount held is unknown, so it can't be reconciled ({after}). It is "
+                                   f"not counted as a discrepancy because there is no amount to compare."),
+                      action="Confirm the amount actually held against the trust-account statement and record it.")
             continue
         s_lease = S.leases[lk]
         sc = _lease_ctx(S, lk)
@@ -694,7 +717,20 @@ def deposit_rules(c: Ctx) -> None:
             matched_src_tgt.add(t_lease.key)
             ttotal = sum(d.n.get("balance") or 0 for d in tdeps)
             comp = dcompare(deps, tdeps, s_lease.id, t_lease.id)
-            if not tdeps:
+            if tdeps and all(blank_balance(d) for d in tdeps):
+                c.add("D-005", lk, subject=subject, source=s_ev, target=ev(tdeps[0], {"lease": t_lease.id}),
+                      compare=comp, keys=keys, deposit=total, match=match_info(ML.matches[lk], "via matched lease"),
+                      explanation=(f"{L['old']} holds a {_money(total)} security deposit for this lease. {L['new']} has "
+                                   f"a deposit row for it, but the balance is blank. Blank is not zero — the "
+                                   f"liability is unrecorded until an amount is entered. Tracked separately from rent."),
+                      action="Enter the held amount on the consolidated deposit record and confirm it against the "
+                             "trust-account ledger.",
+                      impact={"type": "deposit", "cents": total, "monthly": False,
+                              "label": "Deposit liability with a blank balance (separate from rent)",
+                              "calc": [["Held per legacy ledger", _money(total)],
+                                       ["Recorded after migration", "blank (unknown)"],
+                                       ["Unrecorded liability", _money(total)]]})
+            elif not tdeps:
                 c.add("D-001", lk, subject=subject, source=s_ev, compare=comp, keys=keys, deposit=total,
                       match=match_info(ML.matches[lk], "via matched lease"),
                       explanation=(f"{L['old']} holds a {_money(total)} security deposit for this lease. The lease "

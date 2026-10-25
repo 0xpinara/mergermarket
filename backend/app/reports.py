@@ -31,18 +31,46 @@ def collect(conn, deal: dict, status: dict) -> dict:
     for e in events:
         if e["action"] != "evidence_changed":
             last_by_f[e["finding_id"]] = e
+    integration = _integration(conn, deal, status)
+    predicted = integration["predicted_anchors"] if integration else None
     rows = []
     for f in sorted(fs, key=metrics._sev_key):
-        r = metrics.finding_row(f, counted)
+        r = metrics.finding_row(f, counted, deal)
         r["payload"] = f["payload"]
         r["last_review"] = last_by_f.get(f["id"])
+        r["predicted_in_dry_run"] = None if predicted is None else f["payload"]["anchor"] in predicted
         rows.append(r)
     exceptions = [r for r in rows if r["status"] == "expected"]
+    if integration:
+        integration.pop("predicted_anchors")
     return {
+        "integration": integration,
         "deal": {k: deal[k] for k in ("id", "title", "industry", "acquirer", "target_business", "deal_date",
                                       "old_system", "new_system", "source_notes", "source_ref")},
         "is_sample": bool(deal["is_sample"]), "generated_at": db.now(), "engine": config.ENGINE_VERSION,
         "status": status, "summary": summary, "findings": rows, "events": events, "exceptions": exceptions,
+    }
+
+
+def _integration(conn, deal: dict, status: dict) -> dict | None:
+    """Plan / dry run / gates / receipt, when the deal has an integration plan."""
+    from .integrate import dryrun, readiness
+    from .integrate import plan as planmod
+    p = planmod.load(conn, deal["id"])
+    if p is None:
+        return None
+    dr = dryrun.latest(conn, deal["id"])
+    r = readiness.evaluate(conn, deal, status)
+    rc = readiness.latest_receipt(conn, deal["id"])
+    return {
+        "template": {k: p["template"][k] for k in ("id", "name", "version")}, "plan_hash": p["plan_hash"],
+        "plan_version": p["version"], "counts": planmod.counts(p), "readiness": r,
+        "dry_run": {k: dr[k] for k in ("id", "created_at", "plan_hash", "plan_version", "output_hash", "totals",
+                                       "predicted_kpis", "banner", "importer_model")} if dr else None,
+        "comparison": readiness.compare(conn, deal),
+        "receipt": {"id": rc["id"], "sha256": rc["sha256"], "issued_at": rc["receipt"]["issued_at"],
+                    "verifies": rc["verifies"]} if rc else None,
+        "predicted_anchors": {f["anchor"] for f in dr["predicted"]} if dr else None,
     }
 
 
@@ -85,7 +113,8 @@ def render_csv(data: dict) -> bytes:
                 "rent_counted_under", "deposit_discrepancy", "rent_under_review", "confidence",
                 "source_file", "source_row", "source_id", "target_file", "target_row", "target_id",
                 "expected", "observed", "explanation", "recommended_action",
-                "last_reviewer", "last_action", "last_note", "last_reviewed_at", "ai_suggestions"])
+                "last_reviewer", "last_action", "last_note", "last_reviewed_at", "ai_suggestions",
+                "material", "material_reason", "predicted_in_dry_run"])
     for r in data["findings"]:
         p = r["payload"]
         exp, obs = _diff_summary(p)
@@ -98,7 +127,9 @@ def render_csv(data: dict) -> bytes:
             _amount(r["pending_rent_cents"]), r["confidence"], src.get("file"), src.get("row"), src.get("id"),
             tgt.get("file"), tgt.get("row"), tgt.get("id"), exp, obs, p["explanation"], p["recommended_action"],
             lr.get("reviewer"), ACTION_LABEL.get(lr.get("action"), lr.get("action") or ""), lr.get("note"),
-            lr.get("created_at"), sum(1 for c in p.get("candidates") or [] if c.get("origin") == "ai")]])
+            lr.get("created_at"), sum(1 for c in p.get("candidates") or [] if c.get("origin") == "ai"),
+            "yes" if r.get("material") else "no", r.get("material_reason") or "",
+            {None: "no dry run", True: "yes", False: "no"}[r.get("predicted_in_dry_run")]]])
     return ("﻿" + out.getvalue()).encode("utf-8")
 
 
@@ -316,6 +347,49 @@ def render_pdf(data: dict) -> bytes:
     ck = [["Rule", "What is verified", "Checked", "Findings"]] + [
         [r["rule_id"], P(_t(r["check"]), small), f"{r['records_checked']:,}", str(r["findings"])] for r in s["rules"]]
     story.append(grid(ck, [0.55 * inch, W - 1.9 * inch, 0.7 * inch, 0.65 * inch], font=7.5))
+
+    ig = data.get("integration")
+    if ig:
+        story.append(PageBreak())
+        story.append(P("Integration plan, dry run and release gates", h2))
+        dr = ig["dry_run"]
+        so = ig["readiness"].get("signoff")
+        story.append(P(_t(f"Target template {ig['template']['name']} ({ig['template']['version']}). Plan "
+                          f"{ig['plan_hash'][:16]} version {ig['plan_version']}: {ig['counts']['decided']} of "
+                          f"{ig['counts']['total']} columns decided by a named reviewer. "
+                          + (f"Signed off by {so['reviewer']} (single reviewer) at {so['created_at'][:16].replace('T', ' ')} UTC."
+                             if so and not so.get("revoked_at") else "Not signed off.")), small))
+        if dr:
+            pk = dr["predicted_kpis"]
+            story.append(P(_t(f"{dr['banner']}. Dry run {dr['id']} (plan v{dr['plan_version']}): "
+                              f"{dr['totals']['accepted']:,} of {dr['totals']['source_rows']:,} rows simulated, "
+                              f"{dr['totals']['rejected']:,} rejected; {pk['findings']} predicted finding(s), "
+                              f"{pk['critical']} critical / {pk['high']} high. {dr['importer_model']}"), small))
+        cmp_ = ig["comparison"]
+        if cmp_.get("available"):
+            def f3(v, kind):
+                return "-" if v is None else (cents_to_str(v) if kind == "money" else f"{v:,}")
+            t3 = [["Check", "Legacy", "Simulated", "Actual (after load)"]]
+            for t in cmp_["tieouts"]:
+                t3.append([P(_t(t["label"])), P(f3(t["legacy"], t["kind"])), P(f3(t["simulated"], t["kind"])),
+                           P(("" if t["actual_ties"] else "<font color='#D4533B'><b>") + f3(t["actual"], t["kind"]) +
+                             ("" if t["actual_ties"] else "</b></font>"))])
+            story.append(grid(t3, [2.2 * inch, 1.3 * inch, 1.3 * inch, W - 4.8 * inch]))
+            c = cmp_["counts"]
+            story.append(P(_t(f"Prediction vs observation: {c['predicted']} predicted by the dry run, {c['observed']} "
+                              f"observed after the load; {c['both']} both, {c['observed_only']} observed only "
+                              f"(import-time defects), {c['predicted_only']} predicted only. {cmp_['note']}"), small))
+        gt = [["Gate", "Status", "Detail"]]
+        for g in ig["readiness"]["gates"]:
+            col = {"pass": "#1F8F5F", "fail": "#D4533B", "pending": "#6B6455"}[g["status"]]
+            gt.append([P(_t(f"{g['id']} {g['label']}"), small), P(f"<font color='{col}'><b>{g['status'].upper()}</b></font>"),
+                       P(_t(g["detail"]), small)])
+        story.append(grid(gt, [3.0 * inch, 0.7 * inch, W - 3.7 * inch], font=7.5))
+        if ig["receipt"]:
+            rc = ig["receipt"]
+            story.append(P(_t(f"Release receipt {rc['id']} issued {rc['issued_at'][:16].replace('T', ' ')} UTC, sha256 "
+                              f"{rc['sha256']}" + ("" if rc["verifies"] else " — STORED RECEIPT NO LONGER MATCHES ITS HASH")),
+                           mono))
 
     story.append(PageBreak())
     story.append(P("Findings register", h2))

@@ -127,7 +127,9 @@ def summarize(conn, deal: dict, current_fingerprint: str | None) -> dict:
             "findings_total": len(findings), "findings_open": len(open_f),
             "findings_closed": sum(1 for f in findings if not is_open(f)),
             "needs_rereview": sum(1 for f in findings if f["needs_rereview"]),
+            "material_open": sum(1 for f in open_f if material(f, deal)),
         },
+        "materiality": materiality(deal),
         "continuity": {
             "active_leases": n_active, "matched": matched, "accounted": accounted, "clean": clean,
             "score": round(accounted / n_active * 100, 1) if n_active else None,
@@ -149,10 +151,29 @@ def _brief(f: dict, counted: dict) -> dict:
             "rent_covered_by": counted.get(f["id"], {}).get("covered_by")}
 
 
-def finding_row(f: dict, counted: dict) -> dict:
+def materiality(deal: dict | None) -> dict:
+    d = deal or {}
+    return {"rent_cents": d.get("materiality_rent_cents"), "deposit_cents": d.get("materiality_deposit_cents"),
+            "note": "Flags only: a material flag highlights a finding; it never hides, merges or downgrades one."}
+
+
+def material(f: dict, deal: dict | None) -> str | None:
+    """Why a finding meets the deal's materiality thresholds, or None."""
+    m = materiality(deal)
+    rent = max(f["rent_risk_cents"], f["pending_rent_cents"])
+    if m["rent_cents"] is not None and rent > 0 and rent >= m["rent_cents"]:
+        return f"rent ≥ ${m['rent_cents'] / 100:,.0f}/mo"
+    if m["deposit_cents"] is not None and f["deposit_cents"] > 0 and f["deposit_cents"] >= m["deposit_cents"]:
+        return f"deposit ≥ ${m['deposit_cents'] / 100:,.0f}"
+    return None
+
+
+def finding_row(f: dict, counted: dict, deal: dict | None = None) -> dict:
     p = f["payload"]
     src, tgt = p.get("source") or {}, p.get("target") or {}
+    why = material(f, deal)
     return {
+        "material": why is not None, "material_reason": why,
         "id": f["id"], "rule_id": f["rule_id"], "rule_name": RULES.get(f["rule_id"], {}).get("name"),
         "title": f["title"], "severity": f["severity"], "entity": f["entity"], "subject": f["subject"],
         "status": f["status"], "resolution": f["resolution"], "active": bool(f["active"]),

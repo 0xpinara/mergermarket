@@ -3,7 +3,8 @@
 #   ./run.sh            -> http://127.0.0.1:8000
 #   PORT=9000 ./run.sh  -> custom port
 #   ./run.sh test       -> backend test suite
-#   ./run.sh eval       -> ground-truth evaluation (SEEDS=30), writes backend/eval/results.json
+#   ./run.sh eval       -> ground-truth evaluation (SEEDS=30): backend/eval/results.json (engine) and
+#                          backend/eval/results_integrate.json (stress cells, mapping planner, dry run)
 #   ./run.sh mcp        -> MergeProof MCP server on stdio, for AI agents
 #   MERGEPROOF_AI=off   -> rules only, no local model
 set -euo pipefail
@@ -20,7 +21,8 @@ backend/.venv/bin/pip install -q -r backend/requirements-dev.txt
 
 case "${1:-}" in
   test) cd backend && exec .venv/bin/python -m pytest -q 1>&3 ;;
-  eval) cd backend && exec .venv/bin/python -m eval.harness --seeds "${SEEDS:-30}" 1>&3 ;;
+  eval) cd backend && .venv/bin/python -m eval.harness --seeds "${SEEDS:-30}" 1>&3 \
+          && exec .venv/bin/python -m eval.integrate_eval --seeds "${SEEDS:-30}" 1>&3 ;;
   mcp)  cd backend && exec .venv/bin/python -m app.mcp_server 1>&3 ;;
 esac
 

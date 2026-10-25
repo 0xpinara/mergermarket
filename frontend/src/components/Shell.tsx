@@ -111,11 +111,12 @@ export function Shell({ children }: { children: ReactNode }) {
   const items: { to: string | null; label: string; idx: string; badge?: ReactNode; end?: boolean }[] = [
     { to: "/", label: "Command Center", idx: "01", end: true },
     { to: d && `${d}/workspace`, label: "Audit Workspace", idx: "02" },
+    { to: d && `${d}/integrate`, label: "Integrate", idx: "03" },
     {
-      to: d && `${d}/findings`, label: "Findings", idx: "03",
+      to: d && `${d}/findings`, label: "Findings", idx: "04",
       badge: open !== undefined ? <span className={`count${open ? "" : " calm"}`}>{open}</span> : null,
     },
-    { to: d && `${d}/proof`, label: "Continuity Proof", idx: "04" },
+    { to: d && `${d}/proof`, label: "Continuity Proof", idx: "05" },
   ];
 
   return (
@@ -149,11 +150,11 @@ export function Shell({ children }: { children: ReactNode }) {
           )}
           <div className="nav-label">Company</div>
           <NavLink to="/intel" className={({ isActive }) => (isActive ? "active" : "")}>
-            <span className="idx">05</span>
+            <span className="idx">06</span>
             <span>Deal Intelligence</span>
           </NavLink>
           <NavLink to="/about" className={({ isActive }) => (isActive ? "active" : "")}>
-            <span className="idx">06</span>
+            <span className="idx">07</span>
             <span>About &amp; pitch</span>
           </NavLink>
         </nav>

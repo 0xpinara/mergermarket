@@ -64,6 +64,8 @@ export interface Deal {
   updated_at: string;
   status: DealStatus;
   snapshots?: Snapshot[];
+  materiality_rent_cents?: number | null;
+  materiality_deposit_cents?: number | null;
 }
 
 export interface Stage {
@@ -178,7 +180,9 @@ export interface Summary {
     findings_open: number;
     findings_closed: number;
     needs_rereview: number;
+    material_open?: number;
   };
+  materiality?: { rent_cents: number | null; deposit_cents: number | null; note: string };
   continuity?: {
     active_leases: number;
     matched: number;
@@ -259,6 +263,8 @@ export interface FindingRow {
   keys: Record<string, string | null>;
   updated_at: string;
   explanation: string;
+  material?: boolean;
+  material_reason?: string | null;
 }
 
 export interface EvidenceRecord {
@@ -386,6 +392,405 @@ export interface SchemaInfo {
 
 // --------------------------------------------------------------------------- client
 
+// --------------------------------------------------------------------------- integrate (plan → dry run → verify)
+
+export type ItemStatus = "suggested" | "needs_review" | "approved" | "rejected" | "ignored" | "unmapped";
+export type Confidence = "exact" | "derived" | "conflict" | "weak" | "none";
+
+export interface Transform {
+  op: string;
+  [k: string]: unknown;
+}
+
+export interface Signal {
+  kind: "audit" | "name" | "references" | "ai" | "template";
+  points: number;
+  detail: string;
+  ratio?: number;
+}
+
+export interface PlanCandidate {
+  sources: string[];
+  transform: Transform;
+  score: number;
+  signals: Signal[];
+}
+
+export interface Decision {
+  by: string;
+  at: string;
+  action: string;
+  note: string | null;
+}
+
+export interface PlanItem {
+  id: string;
+  table: string;
+  column: string;
+  type: string;
+  canonical: string | null;
+  required: boolean;
+  financial: boolean;
+  description: string;
+  sources: string[];
+  transform: Transform | null;
+  status: ItemStatus;
+  confidence: Confidence;
+  reasons: string[];
+  candidates: PlanCandidate[];
+  excluded: { sources: string[]; reason: string; signals: string[] }[];
+  warnings: string[];
+  live_warnings: string[];
+  decision: Decision | null;
+  bulk_eligible: boolean;
+  needs_note: boolean;
+  enum_coverage?: {
+    mapped: Record<string, { canonical: string; target: string; rows: number }>;
+    unmapped: Record<string, { canonical: string | null; rows: number }>;
+  };
+}
+
+export interface TemplateColumn {
+  name: string;
+  type: string;
+  canonical: string | null;
+  required: boolean;
+  financial: boolean;
+  description: string;
+  max_length?: number;
+  ref?: string;
+  format?: string;
+  values?: Record<string, string | null>;
+  vocabulary?: string | null;
+}
+
+export interface TemplateTable {
+  name: string;
+  entity: string;
+  file: string;
+  key: string;
+  key_prefix: string;
+  columns: TemplateColumn[];
+}
+
+export interface PlanBinding {
+  name: string;
+  entity: string;
+  file: string;
+  snapshot_id: string | null;
+  source_file: string | null;
+  rows: number;
+  unused: string[];
+  note: string | null;
+}
+
+export interface PlanCounts {
+  total: number;
+  approved: number;
+  ignored: number;
+  needs_review: number;
+  suggested: number;
+  rejected: number;
+  unmapped: number;
+  bulk_eligible: number;
+  financial_pending: number;
+  required_open: number;
+  decided: number;
+}
+
+export interface Drift {
+  changed: boolean;
+  plan_fp: string;
+  current_fp: string;
+  issues: { table: string; item?: string; issue: string }[];
+}
+
+export interface Plan {
+  id: string;
+  template: { id: string; name: string; version: string; notes: string; synthetic: boolean; source: string };
+  template_tables: TemplateTable[];
+  version: number;
+  plan_hash: string;
+  contract_fp: string;
+  tables: PlanBinding[];
+  items: PlanItem[];
+  counts: PlanCounts;
+  drift: Drift;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TemplateInfo {
+  id: string;
+  name: string;
+  version: string;
+  source: "bundled" | "derived";
+  synthetic?: boolean;
+  tables?: number;
+  columns?: number;
+  available?: boolean;
+  note?: string;
+}
+
+export interface ProfileColumn {
+  column: string;
+  type: string;
+  type_support: number;
+  rows: number;
+  blank: number;
+  distinct: number;
+  zero: number;
+  unique: boolean;
+  complete: boolean;
+  patterns: { shape: string; count: number }[];
+  min_length: number;
+  max_length: number;
+  pii: boolean;
+  values?: { value: string; count: number }[];
+  examples?: string[];
+  key_candidate: boolean;
+  mapped_to: string | null;
+}
+
+export interface ProfileFile {
+  snapshot_id: string;
+  file: string;
+  sheet: string | null;
+  entity: string;
+  entity_label: string;
+  rows: number;
+  columns: ProfileColumn[];
+  content_hash: string;
+  primary_key: string | null;
+  keys: string[];
+}
+
+export interface Relationship {
+  from: { file: string; entity: string; column: string };
+  to: { file: string; entity: string; column: string };
+  inclusion: number;
+  values: number;
+  missing: number;
+}
+
+export interface SourceProfile {
+  fingerprint: string;
+  files: ProfileFile[];
+  relationships: Relationship[];
+}
+
+export interface Gate {
+  id: string;
+  phase: "plan" | "simulate" | "approve" | "verify";
+  label: string;
+  status: "pass" | "fail" | "pending";
+  detail: string;
+}
+
+export interface Signoff {
+  id: string;
+  plan_hash: string;
+  dry_run_id: string;
+  reviewer: string;
+  statement: string;
+  created_at: string;
+  revoked_at: string | null;
+  revoked_by: string | null;
+}
+
+export interface Readiness {
+  has_plan: boolean;
+  gates: Gate[];
+  signoff_ready: boolean;
+  export_ready: boolean;
+  release_ready: boolean;
+  state: "no_plan" | "planning" | "simulating" | "ready_to_sign" | "verifying" | "ready_to_release" | "released";
+  plan_hash?: string;
+  plan_version?: number;
+  dry_run_id?: string | null;
+  signoff?: Signoff | null;
+}
+
+export interface PreflightGroup {
+  check: string;
+  label: string;
+  table: string;
+  column: string;
+  blocking: boolean;
+  rows: number;
+  examples: { file: string; row: number; value: string | null; detail: string | null;
+              cause?: { check: string; table: string; column: string } }[];
+}
+
+export interface Blast {
+  check: string;
+  label: string;
+  table: string;
+  column: string;
+  rows: Record<string, number>;
+  rows_total: number;
+  active_leases: number;
+  rent_cents: number;
+  deposit_cents: number;
+  open_work_orders: number;
+}
+
+export interface Predicted {
+  id: string;
+  anchor: string;
+  rule_id: string;
+  severity: Severity;
+  title: string;
+  entity: string;
+  subject: string;
+  rent_risk_cents: number;
+  deposit_cents: number;
+  pending_rent_cents: number;
+  explanation: string;
+  source: Ref | null;
+  target: Ref | null;
+}
+
+export interface DryRun {
+  id: string;
+  created_at: string;
+  plan_hash: string;
+  plan_version: number;
+  contract_fp: string;
+  output_hash: string;
+  banner: string;
+  importer_model: string;
+  current?: boolean;
+  template: { id: string; name: string; version: string };
+  plan_status: PlanCounts;
+  provisional: number;
+  tables: { table: string; file: string; source_file: string | null; source_rows: number; accepted: number;
+            rejected: number }[];
+  totals: { source_rows: number; accepted: number; rejected: number; blocking_checks: number; warnings: number };
+  preflight: PreflightGroup[];
+  blast_radius: Blast[];
+  tieouts: Check[];
+  properties: { property: string; legacy_id: string | null; legacy: { active_leases: number; rent_cents: number };
+                simulated: { active_leases: number; rent_cents: number } | null; ties: boolean }[];
+  predicted: Predicted[];
+  predicted_kpis: { findings: number; critical: number; high: number; medium: number; low: number;
+                    rent_at_risk_cents: number; deposit_cents: number };
+  diff: null | {
+    previous_id: string;
+    previous_version: number;
+    preflight: { resolved: string[]; new: string[]; changed: string[] };
+    predicted: { resolved: number; new: number; unchanged: number };
+    rejected_rows: { before: number; after: number };
+    rent_at_risk: { before: number; after: number };
+  };
+  files: Record<string, { file: string; rows: number; sha256: string }>;
+}
+
+export interface SimPreview {
+  banner: string;
+  table: string;
+  file?: string;
+  columns: string[];
+  rows?: Record<string, string>[];
+  lineage?: { row: number; file: string; legacy_key: string | null; columns: Record<string, { sources: string[]; op: string }> }[];
+  rejected?: { row: number; root: { check: string; table: string; column: string };
+               problems: { check: string; column: string; detail: string | null }[] }[];
+  total: number;
+  rejected_total?: number;
+  offset: number;
+}
+
+export interface ObservedRow {
+  finding_id: string;
+  rule_id: string;
+  severity: Severity;
+  title: string;
+  subject: string;
+  status: FindingStatus;
+  open: boolean;
+  rent_risk_cents: number;
+  deposit_cents: number;
+  rent_counted_cents: number;
+}
+
+export interface Comparison {
+  available: boolean;
+  has_dry_run?: boolean;
+  has_audit?: boolean;
+  dry_run_id?: string;
+  dry_run_at?: string;
+  run_id?: string;
+  run_at?: string;
+  counts?: { predicted: number; observed: number; both: number; observed_only: number; predicted_only: number };
+  observed_only?: ObservedRow[];
+  both?: ObservedRow[];
+  predicted_only?: { rule_id: string; severity: Severity; title: string; subject: string; rent_risk_cents: number;
+                     deposit_cents: number }[];
+  tieouts?: { id: string; label: string; kind: "count" | "money"; legacy: number; simulated: number;
+              actual: number | null; simulated_ties: boolean; actual_ties: boolean }[];
+  legacy_changed?: boolean;
+  note?: string;
+}
+
+export interface ReceiptDoc {
+  id: string;
+  sha256: string;
+  verifies?: boolean;
+  receipt: {
+    receipt: string;
+    deal: { id: string; title: string; synthetic: boolean; legacy_system: string | null; target_system: string | null };
+    issued_at: string;
+    issued_by: string;
+    engine_version: string;
+    template: { id: string; name: string; version: string };
+    plan: { hash: string; version: number; source_contract: string };
+    dry_run: { id: string; at: string; simulated_output_sha256: string; rows: DryRun["totals"];
+               predicted: DryRun["predicted_kpis"] };
+    signoff: { reviewer: string; at: string; statement: string; kind: string };
+    export: { manifest_sha256: string; files: Record<string, string> };
+    verification: { run_id: string; at: string; fingerprint: string; findings: { total: number; by_status: Record<string, number> };
+                    continuity_score: number | null };
+    gates: { id: string; label: string; status: string }[];
+    limits: string[];
+  };
+}
+
+export interface IntegOverview {
+  has_plan: boolean;
+  has_legacy: boolean;
+  templates: TemplateInfo[];
+  readiness: Readiness;
+  audit_state: string;
+  banner: string;
+  plan?: { version: number; plan_hash: string; counts: PlanCounts; template: { id: string; name: string; version: string } };
+  dry_run?: Pick<DryRun, "id" | "created_at" | "totals" | "predicted_kpis" | "plan_hash" | "plan_version">;
+  receipt: { id: string; sha256: string; issued_at: string } | null;
+}
+
+export interface FieldEvidence {
+  item: PlanItem;
+  target: TemplateColumn;
+  source_file: string | null;
+  profile: ProfileColumn[];
+  live_warnings: string[];
+  needs_note: boolean;
+  history: { id: string; actor: string; action: string; note: string | null; created_at: string; version: number;
+             before: Partial<PlanItem> | null; after: Partial<PlanItem> | null }[];
+}
+
+export interface PlanEvent {
+  id: string;
+  actor: string;
+  action: string;
+  item_id: string | null;
+  note: string | null;
+  version: number;
+  plan_hash: string;
+  created_at: string;
+  before: Partial<PlanItem> | null;
+  after: Partial<PlanItem> | null;
+}
+
 const WS_KEY = "mp.workspace";
 let memoryWs: string | null = null;
 
@@ -504,6 +909,35 @@ export const api = {
     req<(ReviewEvent & { finding_id: string; title: string; subject: string; rule_id: string; severity: Severity })[]>(
       "GET", `/deals/${dealId}/reviews`),
   unitMap: (dealId: string) => req<UnitMap>("GET", `/deals/${dealId}/unitmap`),
+  integ: {
+    overview: (d: string) => req<IntegOverview>("GET", `/deals/${d}/integrate`),
+    profile: (d: string) => req<SourceProfile>("GET", `/deals/${d}/integrate/profile`),
+    plan: (d: string) => req<Plan>("GET", `/deals/${d}/integrate/plan`),
+    createPlan: (d: string, template_id: string, reviewer: string, replace = false) =>
+      req<Plan>("POST", `/deals/${d}/integrate/plan`, { template_id, reviewer, replace }),
+    act: (d: string, item: string, body: { action: string; reviewer: string; note?: string | null; sources?: string[];
+                                            transform?: Transform }) =>
+      req<Plan>("POST", `/deals/${d}/integrate/plan/items/${encodeURIComponent(item)}`, body),
+    bulk: (d: string, reviewer: string) =>
+      req<{ approved: string[]; plan: Plan }>("POST", `/deals/${d}/integrate/plan/bulk-approve`, { reviewer }),
+    rebase: (d: string, reviewer: string) => req<Plan>("POST", `/deals/${d}/integrate/plan/rebase`, { reviewer }),
+    evidence: (d: string, item: string) =>
+      req<FieldEvidence>("GET", `/deals/${d}/integrate/plan/items/${encodeURIComponent(item)}/evidence`),
+    events: (d: string) => req<PlanEvent[]>("GET", `/deals/${d}/integrate/events`),
+    dryRun: (d: string, reviewer: string) => req<DryRun>("POST", `/deals/${d}/integrate/dry-run`, { reviewer }),
+    latestDryRun: (d: string) => req<DryRun>("GET", `/deals/${d}/integrate/dry-run`),
+    preview: (d: string, table: string, offset = 0, limit = 25, rejected = false) =>
+      req<SimPreview>("GET", `/deals/${d}/integrate/dry-run/preview?table=${encodeURIComponent(table)}&offset=${offset}` +
+                             `&limit=${limit}${rejected ? "&rejected=true" : ""}`),
+    readiness: (d: string) => req<Readiness>("GET", `/deals/${d}/integrate/readiness`),
+    signoff: (d: string, reviewer: string, acknowledge: boolean) =>
+      req<Readiness>("POST", `/deals/${d}/integrate/signoff`, { reviewer, acknowledge }),
+    revoke: (d: string, reviewer: string, note?: string) =>
+      req<Readiness>("POST", `/deals/${d}/integrate/signoff/revoke`, { reviewer, note }),
+    verify: (d: string) => req<{ comparison: Comparison; readiness: Readiness }>("GET", `/deals/${d}/integrate/verify`),
+    issueReceipt: (d: string, reviewer: string) => req<ReceiptDoc>("POST", `/deals/${d}/integrate/receipt`, { reviewer }),
+    receipt: (d: string) => req<ReceiptDoc>("GET", `/deals/${d}/integrate/receipt`),
+  },
   intel: () => req<IntelNote[]>("GET", "/intel"),
   createIntel: (body: Partial<IntelNote>) => req<IntelNote>("POST", "/intel", body),
   updateIntel: (id: string, body: Partial<IntelNote>) => req<IntelNote>("PUT", `/intel/${id}`, body),

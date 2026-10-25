@@ -160,8 +160,12 @@ def main() -> None:
             for idx in range(per_floor):
                 label = f"{floor}{chr(65 + idx)}"
                 beds = [0, 1, 1, 2, 2, 3][(idx + floor) % 6]
+                # Bayview also exported a door code ("MF-4B"). It is unique, but nothing references it —
+                # leases and work orders point at unit_id. A name-based mapper would pick it for a target
+                # "unit_code" key; only relational evidence shows it is the wrong key.
                 u = {"unit_id": f"BV-U-{unit_seq:04d}", "property_id": f"BV-P-{code}",
                      "unit_number": f"Apt {label}" if code == "01" else label,
+                     "unit_code": f"{''.join(w[0] for w in name.split()[:2]).upper()}-{label}",
                      "bedrooms": str(beds), "_code": code, "_label": label}
                 unit_seq += 1
                 units.append(u)

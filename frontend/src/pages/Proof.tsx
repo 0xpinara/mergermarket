@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Download, Printer } from "lucide-react";
-import { downloadUrl, type FindingDetail, type FindingRow, type ReviewEvent, type Summary } from "../lib/api";
+import { downloadUrl, type Comparison, type DryRun, type FindingDetail, type FindingRow, type PlanCounts, type Readiness,
+  type ReviewEvent, type Summary } from "../lib/api";
 import { ENTITY_LABEL, STATUS_LABEL, day, money, num, pct, when } from "../lib/format";
 import { AsciiBar, Empty, ErrorBox, Info, Kicker, Loading, SevChip, StatusPill } from "../components/ui";
 import { useRouteDeal } from "./Workspace";
@@ -16,6 +17,74 @@ interface Report {
   findings: (FindingRow & { payload: FindingDetail["payload"]; last_review: (ReviewEvent & { finding_id: string }) | null })[];
   events: (ReviewEvent & { finding_id: string; title: string; subject: string; rule_id: string })[];
   exceptions: Report["findings"];
+  integration: null | {
+    template: { id: string; name: string; version: string };
+    plan_hash: string;
+    plan_version: number;
+    counts: PlanCounts;
+    readiness: Readiness;
+    dry_run: null | Pick<DryRun, "id" | "created_at" | "plan_hash" | "plan_version" | "output_hash" | "totals" |
+      "predicted_kpis" | "banner" | "importer_model">;
+    comparison: Comparison;
+    receipt: null | { id: string; sha256: string; issued_at: string; verifies: boolean };
+  };
+}
+
+function IntegrationSection({ ig }: { ig: NonNullable<Report["integration"]> }) {
+  const so = ig.readiness.signoff;
+  const c = ig.comparison;
+  return (
+    <>
+      <h2 className="sh"><span className="n">§12</span> Integration plan, dry run &amp; release gates</h2>
+      <p style={{ fontSize: 14 }}>
+        Template <b>{ig.template.name}</b> ({ig.template.version}) · plan <span className="mono">{ig.plan_hash.slice(0, 12)}</span> v{ig.plan_version} ·{" "}
+        {ig.counts.decided}/{ig.counts.total} columns decided by a named reviewer ·{" "}
+        {so && !so.revoked_at ? <>signed off by <b>{so.reviewer}</b> (single reviewer) {when(so.created_at)}</> : "not signed off"}.
+      </p>
+      {ig.dry_run && (
+        <p className="muted" style={{ fontSize: 13 }}>
+          <b>{ig.dry_run.banner}.</b> Dry run {ig.dry_run.id}: {num(ig.dry_run.totals.accepted)}/{num(ig.dry_run.totals.source_rows)} rows
+          simulated, {num(ig.dry_run.totals.rejected)} rejected, {ig.dry_run.predicted_kpis.findings} predicted finding(s).
+        </p>
+      )}
+      {c.available && c.tieouts && (
+        <table className="ledger">
+          <tbody>
+            <tr><td className="muted">Check</td><td className="amt muted">Legacy</td><td className="amt muted">Simulated</td><td className="amt muted">Actual</td></tr>
+            {c.tieouts.map((t) => {
+              const f = (v: number | null) => (v === null ? "—" : t.kind === "money" ? money(v) : num(v));
+              return (
+                <tr key={t.id}>
+                  <td>{t.label}</td><td className="amt">{f(t.legacy)}</td><td className="amt">{f(t.simulated)}</td>
+                  <td className="amt" style={t.actual_ties ? undefined : { color: "var(--coral-ink)" }}>{f(t.actual)}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      )}
+      {c.available && c.counts && (
+        <p style={{ fontSize: 13.5, marginTop: 8 }}>
+          {c.counts.predicted} predicted · {c.counts.observed} observed after the load · <b>{c.counts.observed_only}</b> import-time defect(s)
+          the dry run could not have seen. {c.note}
+        </p>
+      )}
+      <ul className="checklist" style={{ marginTop: 10 }}>
+        {ig.readiness.gates.map((g) => (
+          <li key={g.id}>
+            <span className={`mark ${g.status === "pending" ? "" : g.status}`}>{g.id} {g.status === "pass" ? "✓" : g.status === "fail" ? "✕" : "·"}</span>
+            <span>{g.label}</span><span className="vals">{g.status}</span><span className="note">{g.detail}</span>
+          </li>
+        ))}
+      </ul>
+      {ig.receipt && (
+        <p className="mono" style={{ fontSize: 12, marginTop: 8 }}>
+          Release receipt {ig.receipt.id} · {when(ig.receipt.issued_at)} · sha256 {ig.receipt.sha256}
+          {!ig.receipt.verifies && " — stored receipt no longer matches its hash"}
+        </p>
+      )}
+    </>
+  );
 }
 
 const ACTION: Record<string, string> = {
@@ -53,7 +122,7 @@ export function Proof() {
   if (!s.has_run) {
     return (
       <div className="page">
-        <Kicker sec="04">Continuity proof</Kicker>
+        <Kicker sec="05">Continuity proof</Kicker>
         <Empty title="Nothing to prove yet" actions={<Link className="btn primary" to={`/deals/${id}/workspace`}>Run the audit</Link>}>
           The report is generated from a completed audit run and the current review decisions.
         </Empty>
@@ -73,7 +142,7 @@ export function Proof() {
     <div className="page">
       <div className="page-head no-print">
         <div>
-          <Kicker sec="04">Continuity proof</Kicker>
+          <Kicker sec="05">Continuity proof</Kicker>
           <h1 className="page-title">The report for the <em>integration meeting</em></h1>
           <p className="page-sub">Generated from the latest run plus every review decision so far. Exports include current status.</p>
         </div>
@@ -341,7 +410,9 @@ export function Proof() {
           </table>
         </div>
 
-        <h2 className="sh"><span className="n">§12</span> AI assistance</h2>
+        {r.integration && <IntegrationSection ig={r.integration} />}
+
+        <h2 className="sh"><span className="n">§{r.integration ? "13" : "12"}</span> AI assistance</h2>
         {s.ai?.available ? (
           <p style={{ fontSize: 14 }}>
             A local open-source model ({s.ai.model}) ran on the MergeProof server. It made{" "}

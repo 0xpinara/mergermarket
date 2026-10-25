@@ -11,6 +11,7 @@ from .schema import ENTITIES
 
 DEAL_FIELDS = ("title", "industry", "acquirer", "target_business", "deal_date", "old_system", "new_system",
                "source_notes", "source_ref")
+MATERIALITY_FIELDS = ("materiality_rent_cents", "materiality_deposit_cents")
 
 SAMPLE_DEAL = {
     "title": "Cedar × Bayview | Tenant & Rent Roll Migration",
@@ -23,6 +24,8 @@ SAMPLE_DEAL = {
     "source_notes": ("Legacy export taken 2026-09-30 at cutover; consolidated export pulled 2026-10-02 after the "
                      "migration batch. Fictional companies, people and amounts — synthetic demonstration data."),
     "source_ref": "Synthetic seed v1 (deterministic)",
+    "materiality_rent_cents": 50000,
+    "materiality_deposit_cents": 100000,
 }
 
 
@@ -35,6 +38,9 @@ def create_deal(conn, workspace: str, data: dict, is_sample: bool = False) -> st
         f"INSERT INTO deals (id, workspace, {', '.join(DEAL_FIELDS)}, is_sample, created_at, updated_at) "
         f"VALUES (?, ?, {', '.join('?' for _ in DEAL_FIELDS)}, ?, ?, ?)",
         (did, workspace, *[vals[k] for k in DEAL_FIELDS], 1 if is_sample else 0, ts, ts))
+    mat = {k: data[k] for k in MATERIALITY_FIELDS if isinstance(data.get(k), int)}
+    if mat:
+        conn.execute(f"UPDATE deals SET {', '.join(f'{k}=?' for k in mat)} WHERE id=?", (*mat.values(), did))
     return did
 
 

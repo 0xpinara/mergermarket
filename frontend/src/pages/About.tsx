@@ -98,7 +98,7 @@ const PIPE = String.raw`
 export function About() {
   return (
     <div className="page">
-      <Kicker sec="06">About &amp; pitch</Kicker>
+      <Kicker sec="07">About &amp; pitch</Kicker>
       <h1 className="page-title">Moving data is not the same as <em>proving it survived.</em></h1>
       <div className="grid split section">
         <div className="prose">
@@ -131,6 +131,8 @@ export function About() {
             <li>Conservative by design: ambiguous matches go to a human; two “Alex Kim” records never collapse on name alone.</li>
             <li>Money that holds up: rent at risk is deduplicated per lease, labelled an estimate, and deposits are kept separate as a liability.</li>
             <li>Deterministic and explainable — no model invents differences; a local model only suggests, and its results are measured.</li>
+            <li>Before <i>and</i> after: plan the import against the target’s template, rehearse it in a dry run that predicts findings with the
+              same rules, sign off one exact plan hash, then verify what actually loaded — with a tamper-evident release receipt.</li>
           </ul>
 
           <h3>Why now</h3>
@@ -177,6 +179,8 @@ export function About() {
             <li>Audits exports you provide; no AppFolio, Buildium, Yardi or other vendor connection.</li>
             <li>Workspaces are separated per browser for the demo, not secured — real customer data needs access controls, tenant separation, a retention policy and a security review first.</li>
             <li>No PitchBook or WRDS data integration.</li>
+            <li>The Cedar import template is fictional, and the dry run models a strict importer — a real destination’s importer may differ.
+              Sign-off is single-reviewer; the release receipt records checks, it is not an audit opinion.</li>
           </ul>
         </div>
         <aside className="stack about-aside">
