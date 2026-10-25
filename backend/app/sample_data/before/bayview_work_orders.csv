@@ -1,0 +1,72 @@
+ticket_id,property_id,unit_id,summary,priority,status,opened_on
+BV-WO-3001,BV-P-05,BV-U-0099,Garbage disposal jammed,Normal,Completed,2026-07-09
+BV-WO-3002,BV-P-07,BV-U-0156,Dishwasher not draining,Normal,Completed,2026-06-28
+BV-WO-3003,BV-P-02,BV-U-0049,Dishwasher not draining,Normal,Completed,2026-08-17
+BV-WO-3004,BV-P-01,BV-U-0008,Garbage disposal jammed,Normal,Open,2026-09-13
+BV-WO-3005,BV-P-06,BV-U-0123,Mold spotting on bathroom ceiling,High,Completed,2026-07-27
+BV-WO-3006,BV-P-07,BV-U-0156,Balcony door seal worn,Low,In Progress,2026-08-16
+BV-WO-3007,BV-P-06,BV-U-0133,Bedroom window will not latch,Normal,Completed,2026-08-05
+BV-WO-3008,BV-P-01,BV-U-0018,Refrigerator not cooling,High,Completed,2026-07-08
+BV-WO-3009,BV-P-06,BV-U-0143,Mailbox key replacement,Low,Completed,2026-06-12
+BV-WO-3010,BV-P-07,BV-U-0156,Hallway light fixture out,Low,Open,2026-09-18
+BV-WO-3011,BV-P-05,BV-U-0094,Toilet running constantly,Normal,Completed,2026-08-23
+BV-WO-3012,BV-P-01,BV-U-0019,Smoke detector chirping,High,Completed,2026-08-22
+BV-WO-3013,BV-P-04,BV-U-0092,Washer leaves water in drum,Normal,In Progress,2026-06-07
+BV-WO-3014,BV-P-03,BV-U-0073,Shower drain clogged,Normal,In Progress,2026-09-06
+BV-WO-3015,BV-P-04,BV-U-0084,Oven igniter clicking,Normal,Completed,2026-06-06
+BV-WO-3016,BV-P-05,BV-U-0101,Blinds broken in living room,Low,Completed,2026-07-10
+BV-WO-3017,BV-P-07,BV-U-0173,Garbage disposal jammed,Normal,In Progress,2026-07-27
+BV-WO-3018,BV-P-06,BV-U-0145,Refrigerator not cooling,High,Completed,2026-08-23
+BV-WO-3019,BV-P-04,BV-U-0085,Balcony door seal worn,Low,Completed,2026-06-18
+BV-WO-3020,BV-P-02,BV-U-0033,Mold spotting on bathroom ceiling,High,Completed,2026-07-28
+BV-WO-3021,BV-P-04,BV-U-0084,Washer leaves water in drum,Normal,Completed,2026-08-12
+BV-WO-3022,BV-P-04,BV-U-0084,Bathroom exhaust fan noisy,Low,In Progress,2026-09-21
+BV-WO-3023,BV-P-03,BV-U-0068,Bedroom window will not latch,Normal,Open,2026-09-10
+BV-WO-3024,BV-P-01,BV-U-0024,Dishwasher not draining,Normal,Completed,2026-07-03
+BV-WO-3025,BV-P-05,BV-U-0094,Hallway light fixture out,Low,Completed,2026-07-11
+BV-WO-3026,BV-P-02,BV-U-0050,Front door lock sticking,Normal,Open,2026-09-20
+BV-WO-3027,BV-P-07,BV-U-0155,Smoke detector chirping,High,Completed,2026-06-21
+BV-WO-3028,BV-P-01,BV-U-0022,Mold spotting on bathroom ceiling,High,Completed,2026-06-16
+BV-WO-3029,BV-P-03,BV-U-0072,Refrigerator not cooling,High,Completed,2026-08-03
+BV-WO-3030,BV-P-03,BV-U-0061,Balcony door seal worn,Low,Completed,2026-07-06
+BV-WO-3031,BV-P-04,BV-U-0077,Smoke detector chirping,High,Completed,2026-08-13
+BV-WO-3032,BV-P-06,BV-U-0139,Shower drain clogged,Normal,Completed,2026-08-17
+BV-WO-3033,BV-P-07,BV-U-0172,Shower drain clogged,Normal,In Progress,2026-08-22
+BV-WO-3034,BV-P-01,BV-U-0008,Dishwasher not draining,Normal,Completed,2026-06-25
+BV-WO-3035,BV-P-06,BV-U-0130,Blinds broken in living room,Low,Completed,2026-06-11
+BV-WO-3036,BV-P-06,BV-U-0123,Dishwasher not draining,Normal,Completed,2026-07-31
+BV-WO-3037,BV-P-01,BV-U-0025,Garbage disposal jammed,Normal,Completed,2026-08-17
+BV-WO-3038,BV-P-03,BV-U-0068,Pest control request - ants,Low,Open,2026-09-04
+BV-WO-3039,BV-P-06,BV-U-0142,Slow leak under bathroom sink,Normal,Completed,2026-06-18
+BV-WO-3040,BV-P-01,BV-U-0005,Mailbox key replacement,Low,In Progress,2026-08-24
+BV-WO-3041,BV-P-03,BV-U-0074,Balcony door seal worn,Low,In Progress,2026-08-28
+BV-WO-3042,BV-P-08,BV-U-0176,Thermostat display blank,Normal,Completed,2026-06-25
+BV-WO-3043,BV-P-08,BV-U-0185,Mold spotting on bathroom ceiling,High,Open,2026-09-18
+BV-WO-3044,BV-P-07,BV-U-0165,Ceiling stain after rain,High,In Progress,2026-09-01
+BV-WO-3045,BV-P-01,BV-U-0024,Toilet running constantly,Normal,In Progress,2026-09-03
+BV-WO-3046,BV-P-02,BV-U-0034,Refrigerator not cooling,High,Open,2026-09-16
+BV-WO-3047,BV-P-01,BV-U-0029,Washer leaves water in drum,Normal,Open,2026-09-07
+BV-WO-3048,BV-P-05,BV-U-0110,Balcony door seal worn,Low,Open,2026-09-03
+BV-WO-3049,BV-P-05,BV-U-0101,Bathroom exhaust fan noisy,Low,Completed,2026-08-18
+BV-WO-3050,BV-P-05,BV-U-0109,Smoke detector chirping,High,Completed,2026-07-16
+BV-WO-3051,BV-P-04,BV-U-0079,Mailbox key replacement,Low,Completed,2026-06-10
+BV-WO-3052,BV-P-02,BV-U-0033,Front door lock sticking,Normal,In Progress,2026-07-29
+BV-WO-3053,BV-P-03,BV-U-0073,Intercom buzzer not working,Low,Completed,2026-06-07
+BV-WO-3054,BV-P-05,BV-U-0109,Pest control request - ants,Low,Completed,2026-07-13
+BV-WO-3055,BV-P-06,BV-U-0125,Thermostat display blank,Normal,Open,2026-09-01
+BV-WO-3056,BV-P-07,BV-U-0165,Dishwasher not draining,Normal,In Progress,2026-09-06
+BV-WO-3057,BV-P-06,BV-U-0123,Bedroom window will not latch,Normal,Completed,2026-06-14
+BV-WO-3058,BV-P-04,BV-U-0090,Hallway light fixture out,Low,Completed,2026-08-12
+BV-WO-3059,BV-P-01,BV-U-0025,Water heater pilot keeps going out,High,Open,2026-09-28
+BV-WO-3060,BV-P-07,BV-U-0155,Front door lock sticking,Normal,In Progress,2026-09-22
+BV-WO-3061,BV-P-03,BV-U-0067,Slow leak under bathroom sink,Normal,Open,2026-09-23
+BV-WO-3062,BV-P-02,BV-U-0037,Toilet running constantly,Normal,Open,2026-09-17
+BV-WO-3063,BV-P-06,BV-U-0146,Pest control request - ants,Low,Open,2026-08-30
+BV-WO-3064,BV-P-07,BV-U-0158,Oven igniter clicking,Normal,Completed,2026-07-14
+BV-WO-3065,BV-P-06,BV-U-0136,Mold spotting on bathroom ceiling,High,Completed,2026-06-05
+BV-WO-3066,BV-P-07,BV-U-0163,Thermostat display blank,Normal,In Progress,2026-09-02
+BV-WO-3067,BV-P-07,BV-U-0159,Toilet running constantly,Normal,Completed,2026-07-28
+BV-WO-3068,BV-P-03,BV-U-0074,Smoke detector chirping,High,Open,2026-09-19
+BV-WO-3069,BV-P-05,BV-U-0105,No heat - bedroom radiator cold,Urgent,Open,2026-09-27
+BV-WO-3070,BV-P-08,BV-U-0179,Leaking kitchen faucet,High,In Progress,2026-09-21
+BV-WO-3071,BV-P-06,BV-U-0143,Mold spotting on bathroom ceiling,High,In Progress,2026-09-18

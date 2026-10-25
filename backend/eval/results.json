@@ -1,0 +1,557 @@
+{
+ "generated_at": "2026-10-25T14:04:23Z",
+ "engine": "mp-recon 1.0.0",
+ "rules_only": {
+  "seeds": 30,
+  "ai_model": null,
+  "anomalies": {
+   "injected": 635,
+   "detected": 620,
+   "recall": 0.9764,
+   "false_alarms": 0,
+   "precision": 1.0,
+   "routed_to_review": 33,
+   "missed_but_flagged_for_review": 15,
+   "silently_missed": 0,
+   "missed_examples": [],
+   "false_alarm_examples": []
+  },
+  "matching": {
+   "properties": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "pairs": 240
+   },
+   "units": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "pairs": 5580
+   },
+   "tenants": {
+    "precision": 1.0,
+    "recall": 0.9955,
+    "pairs": 5610
+   },
+   "leases": {
+    "precision": 1.0,
+    "recall": 0.9973,
+    "pairs": 5562
+   },
+   "maintenance": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "pairs": 2041
+   }
+  },
+  "money": {
+   "rent_at_risk_exact": 30,
+   "deposit_exact": 30,
+   "of": 30
+  },
+  "mapping_failures": 0,
+  "ai_work_orders": {
+   "rewrites": 44,
+   "top1": 0,
+   "any": 0,
+   "dropped": 45,
+   "spurious": 0
+  },
+  "ms_per_audit": 112.4
+ },
+ "with_ai": {
+  "seeds": 30,
+  "ai_model": "minishlab/potion-retrieval-32M",
+  "anomalies": {
+   "injected": 635,
+   "detected": 620,
+   "recall": 0.9764,
+   "false_alarms": 0,
+   "precision": 1.0,
+   "routed_to_review": 33,
+   "missed_but_flagged_for_review": 15,
+   "silently_missed": 0,
+   "missed_examples": [],
+   "false_alarm_examples": []
+  },
+  "matching": {
+   "properties": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "pairs": 240
+   },
+   "units": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "pairs": 5580
+   },
+   "tenants": {
+    "precision": 1.0,
+    "recall": 0.9955,
+    "pairs": 5610
+   },
+   "leases": {
+    "precision": 1.0,
+    "recall": 0.9973,
+    "pairs": 5562
+   },
+   "maintenance": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "pairs": 2041
+   }
+  },
+  "money": {
+   "rent_at_risk_exact": 30,
+   "deposit_exact": 30,
+   "of": 30
+  },
+  "mapping_failures": 0,
+  "ai_work_orders": {
+   "rewrites": 44,
+   "top1": 44,
+   "any": 44,
+   "dropped": 45,
+   "spurious": 1
+  },
+  "ms_per_audit": 137.0
+ },
+ "ai_status": {
+  "enabled": true,
+  "available": true,
+  "model": "minishlab/potion-retrieval-32M",
+  "dim": 512,
+  "load_ms": 914,
+  "local": true,
+  "reason": null
+ },
+ "headers": {
+  "rules_only": {
+   "summary": {
+    "correct": 15,
+    "wrong": 0,
+    "abstained": 14,
+    "total": 29,
+    "accuracy": 0.517
+   },
+   "rows": [
+    {
+     "entity": "leases",
+     "header": "Monthly Charge Amt",
+     "expected": "monthly_rent",
+     "got": "monthly_rent",
+     "by": "rules"
+    },
+    {
+     "entity": "leases",
+     "header": "Resident Moved In",
+     "expected": "start_date",
+     "got": "start_date",
+     "by": "rules"
+    },
+    {
+     "entity": "leases",
+     "header": "Lease Expires On",
+     "expected": "end_date",
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "leases",
+     "header": "Occupant",
+     "expected": "tenant_id",
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "leases",
+     "header": "Recurring Charge",
+     "expected": "monthly_rent",
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "leases",
+     "header": "Lease Commencement",
+     "expected": "start_date",
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "leases",
+     "header": "Apartment Ref",
+     "expected": "unit_id",
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "leases",
+     "header": "Agreement No",
+     "expected": "lease_id",
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "leases",
+     "header": "Occupancy State",
+     "expected": "status",
+     "got": "status",
+     "by": "rules"
+    },
+    {
+     "entity": "leases",
+     "header": "Notes",
+     "expected": null,
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "leases",
+     "header": "Phone",
+     "expected": null,
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "leases",
+     "header": "Pet Fee",
+     "expected": null,
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "leases",
+     "header": "Parking Spot",
+     "expected": null,
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "deposits",
+     "header": "Escrow Held",
+     "expected": "balance",
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "deposits",
+     "header": "Security Held Amt",
+     "expected": "balance",
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "deposits",
+     "header": "Tenancy Ref",
+     "expected": "lease_id",
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "deposits",
+     "header": "Comments",
+     "expected": null,
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "maintenance",
+     "header": "Problem Reported",
+     "expected": "summary",
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "maintenance",
+     "header": "Logged On",
+     "expected": "opened_date",
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "maintenance",
+     "header": "Urgency Level",
+     "expected": "priority",
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "maintenance",
+     "header": "Job Number",
+     "expected": "ticket_id",
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "maintenance",
+     "header": "Work Status",
+     "expected": "status",
+     "got": "status",
+     "by": "rules"
+    },
+    {
+     "entity": "maintenance",
+     "header": "Vendor",
+     "expected": null,
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "maintenance",
+     "header": "Cost",
+     "expected": null,
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "tenants",
+     "header": "Renter Full Name",
+     "expected": "full_name",
+     "got": "full_name",
+     "by": "rules"
+    },
+    {
+     "entity": "tenants",
+     "header": "E-mail Addr",
+     "expected": "email",
+     "got": "email",
+     "by": "rules"
+    },
+    {
+     "entity": "tenants",
+     "header": "Cell #",
+     "expected": "phone",
+     "got": "phone",
+     "by": "rules"
+    },
+    {
+     "entity": "tenants",
+     "header": "Renter No",
+     "expected": "tenant_id",
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "tenants",
+     "header": "Emergency Contact",
+     "expected": null,
+     "got": null,
+     "by": null
+    }
+   ]
+  },
+  "with_ai": {
+   "summary": {
+    "correct": 24,
+    "wrong": 1,
+    "abstained": 4,
+    "total": 29,
+    "accuracy": 0.828
+   },
+   "rows": [
+    {
+     "entity": "leases",
+     "header": "Monthly Charge Amt",
+     "expected": "monthly_rent",
+     "got": "monthly_rent",
+     "by": "rules"
+    },
+    {
+     "entity": "leases",
+     "header": "Resident Moved In",
+     "expected": "start_date",
+     "got": "start_date",
+     "by": "rules"
+    },
+    {
+     "entity": "leases",
+     "header": "Lease Expires On",
+     "expected": "end_date",
+     "got": "end_date",
+     "by": "ai"
+    },
+    {
+     "entity": "leases",
+     "header": "Occupant",
+     "expected": "tenant_id",
+     "got": "tenant_id",
+     "by": "ai"
+    },
+    {
+     "entity": "leases",
+     "header": "Recurring Charge",
+     "expected": "monthly_rent",
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "leases",
+     "header": "Lease Commencement",
+     "expected": "start_date",
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "leases",
+     "header": "Apartment Ref",
+     "expected": "unit_id",
+     "got": "unit_id",
+     "by": "ai"
+    },
+    {
+     "entity": "leases",
+     "header": "Agreement No",
+     "expected": "lease_id",
+     "got": "lease_id",
+     "by": "ai"
+    },
+    {
+     "entity": "leases",
+     "header": "Occupancy State",
+     "expected": "status",
+     "got": "status",
+     "by": "rules"
+    },
+    {
+     "entity": "leases",
+     "header": "Notes",
+     "expected": null,
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "leases",
+     "header": "Phone",
+     "expected": null,
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "leases",
+     "header": "Pet Fee",
+     "expected": null,
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "leases",
+     "header": "Parking Spot",
+     "expected": null,
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "deposits",
+     "header": "Escrow Held",
+     "expected": "balance",
+     "got": "balance",
+     "by": "ai"
+    },
+    {
+     "entity": "deposits",
+     "header": "Security Held Amt",
+     "expected": "balance",
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "deposits",
+     "header": "Tenancy Ref",
+     "expected": "lease_id",
+     "got": "tenant_id",
+     "by": "ai"
+    },
+    {
+     "entity": "deposits",
+     "header": "Comments",
+     "expected": null,
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "maintenance",
+     "header": "Problem Reported",
+     "expected": "summary",
+     "got": "summary",
+     "by": "ai"
+    },
+    {
+     "entity": "maintenance",
+     "header": "Logged On",
+     "expected": "opened_date",
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "maintenance",
+     "header": "Urgency Level",
+     "expected": "priority",
+     "got": "priority",
+     "by": "ai"
+    },
+    {
+     "entity": "maintenance",
+     "header": "Job Number",
+     "expected": "ticket_id",
+     "got": "ticket_id",
+     "by": "ai"
+    },
+    {
+     "entity": "maintenance",
+     "header": "Work Status",
+     "expected": "status",
+     "got": "status",
+     "by": "rules"
+    },
+    {
+     "entity": "maintenance",
+     "header": "Vendor",
+     "expected": null,
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "maintenance",
+     "header": "Cost",
+     "expected": null,
+     "got": null,
+     "by": null
+    },
+    {
+     "entity": "tenants",
+     "header": "Renter Full Name",
+     "expected": "full_name",
+     "got": "full_name",
+     "by": "rules"
+    },
+    {
+     "entity": "tenants",
+     "header": "E-mail Addr",
+     "expected": "email",
+     "got": "email",
+     "by": "rules"
+    },
+    {
+     "entity": "tenants",
+     "header": "Cell #",
+     "expected": "phone",
+     "got": "phone",
+     "by": "rules"
+    },
+    {
+     "entity": "tenants",
+     "header": "Renter No",
+     "expected": "tenant_id",
+     "got": "tenant_id",
+     "by": "ai"
+    },
+    {
+     "entity": "tenants",
+     "header": "Emergency Contact",
+     "expected": null,
+     "got": null,
+     "by": null
+    }
+   ]
+  }
+ }
+}
