@@ -7,13 +7,14 @@ command shown; nothing has been edited by hand.
 
 | Check | Command | Result |
 |---|---|---|
-| Backend tests | `cd backend && .venv/bin/python -m pytest -q` | **PASS** — 164 passed (66.6 s). Baseline was 123 |
+| Backend tests | `cd backend && .venv/bin/python -m pytest -q` | **PASS** — 165 passed (90.6 s). Baseline was 123 |
 | Lint | `ruff check app tests eval scripts --select E,F,W --ignore E501,E741` (backend) and `ruff check scripts` (repo) | **PASS** |
 | Frontend types + build | `npx tsc -b --noEmit && npx vite build` | **PASS** |
 | Engine ground-truth eval | `python -m eval.harness --seeds 30` | **PASS** — see §2 |
 | Integration eval | `python -m eval.integrate_eval --seeds 30` | measured — see §3; two planted mistakes undetectable by design |
 | Browser smoke test, desktop + mobile | `python scripts/smoke_test.py http://127.0.0.1:8765` | **PASS** |
 | Browser E2E, Integrate journey | `python scripts/e2e_integrate.py http://127.0.0.1:8765` | **PASS** — 15 findings reviewed, receipt issued, no console errors, every step 390 px wide on a phone |
+| Browser E2E, first-visit demo portfolio | `python scripts/e2e_demo_seed.py http://127.0.0.1:8765` | **PASS** — 3 seeded deals; every page and every Integrate step populated; no console errors |
 | MCP stdio handshake | real `mcp` client over stdio | **PASS** — server `mergeproof 1.1.0`, 15 tools; tenant names returned as `PERSON_…`; bad deal ID gives an actionable `is_error` |
 
 ## 1. Backend tests by area
@@ -23,6 +24,7 @@ command shown; nothing has been edited by hand.
 | `test_integrate.py` (16) | Template strictness; transform allowlist (no `eval`, no money constant); profile keys, references and PII masking; unit-key conflict routed to review; review guards and the event log; content-addressed plan hash; the demo (wrong key → 187/160/71 rejected, $387,115 and $319,975 → fix → clean, diff); sign-off → deterministic export → verify (observed-only $2,250 / $450 / $1,800) → receipt with tamper detection; edits void sign-off; blank deposit ≠ 0; formula guard; drift → rebase; derived template; workspace isolation; report sections; medium predicted findings block G7; a reference-backed key is offered when the audit mapping is wrong |
 | `test_integrate_eval.py` (11) | Fast regression gate on a seed subset for every eval cell below |
 | `test_deposit_blank.py` (2) | D-005 on both sides; zero is a real difference (D-002) |
+| `test_demo_seed.py` (1) | Demo portfolio: three deals in their intended states (verifying / released with a verifying receipt / planning), reviews spread over real dates, seven fictional prospects on `.example` domains, seeded once per workspace, and "Try sample acquisition" still opens Bayview |
 | `test_materiality.py` (1) | Flags only — the same rows before and after; thresholds editable; negatives rejected |
 | `test_privacy.py` (4), `test_mcp.py` (9) | Token stability and scope; every tool's detailed output is free of sample names, emails and phones while IDs and cents survive; pagination; actionable errors; injection text returned as data with no state change |
 | Earlier suites (121 tests) | Engine, matching, ingest, normalizers, review regressions, XLSX, AI, eval gate — all still green |

@@ -1,5 +1,5 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, type Deal } from "./api";
 
 function read(key: string, fallback: string): string {
@@ -26,6 +26,8 @@ interface AppState {
   setReviewer: (name: string) => void;
   deals: Deal[];
   dealsLoading: boolean;
+  /** True while a brand-new workspace is being given the synthetic demo portfolio. */
+  seeding: boolean;
 }
 
 const Ctx = createContext<AppState | null>(null);
@@ -34,6 +36,9 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   const [dealId, setDealIdState] = useState<string | null>(() => read("mp.deal", "") || null);
   const [reviewer, setReviewerState] = useState<string>(() => read("mp.reviewer", "Demo Reviewer"));
   const dealsQ = useQuery({ queryKey: ["deals"], queryFn: api.deals });
+  const qc = useQueryClient();
+  const [seeding, setSeeding] = useState(false);
+  const seedTried = useRef(false);
 
   const setDealId = useCallback((id: string | null) => {
     setDealIdState(id);
@@ -44,16 +49,32 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     write("mp.reviewer", name);
   }, []);
 
+  // First visit: fill the empty workspace with the lived-in synthetic demo portfolio (once per workspace; the
+  // server ignores the call if this workspace has any deal or was seeded before). Opt out: mp.demoSeed = "off".
+  useEffect(() => {
+    if (!dealsQ.data || dealsQ.data.length || seedTried.current || read("mp.demoSeed", "on") === "off") return;
+    seedTried.current = true;
+    setSeeding(true);
+    api.seedDemo()
+      .then((r) => {
+        if (r.deal_id) setDealId(r.deal_id);
+        return qc.invalidateQueries({ queryKey: ["deals"] });
+      })
+      .catch(() => undefined)
+      .finally(() => setSeeding(false));
+  }, [dealsQ.data, qc]);
+
   // Fall back to the most recent audit when the remembered one no longer exists.
   useEffect(() => {
-    if (!dealsQ.data) return;
+    if (!dealsQ.data || seeding) return;
     if (dealId && dealsQ.data.some((d) => d.id === dealId)) return;
     setDealId(dealsQ.data[0]?.id ?? null);
-  }, [dealsQ.data, dealId, setDealId]);
+  }, [dealsQ.data, dealId, setDealId, seeding]);
 
   const value = useMemo(
-    () => ({ dealId, setDealId, reviewer, setReviewer, deals: dealsQ.data ?? [], dealsLoading: dealsQ.isLoading }),
-    [dealId, setDealId, reviewer, setReviewer, dealsQ.data, dealsQ.isLoading],
+    () => ({ dealId, setDealId, reviewer, setReviewer, deals: dealsQ.data ?? [], dealsLoading: dealsQ.isLoading,
+             seeding }),
+    [dealId, setDealId, reviewer, setReviewer, dealsQ.data, dealsQ.isLoading, seeding],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

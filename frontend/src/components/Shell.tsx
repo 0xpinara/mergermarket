@@ -96,7 +96,7 @@ function DealSwitcher() {
 }
 
 export function Shell({ children }: { children: ReactNode }) {
-  const { dealId, reviewer, setReviewer } = useAppState();
+  const { dealId, reviewer, setReviewer, seeding } = useAppState();
   const [navOpen, setNavOpen] = useState(false);
   const loc = useLocation();
   const summary = useQuery({
@@ -180,6 +180,13 @@ export function Shell({ children }: { children: ReactNode }) {
             <span id="reviewer-hint" className="sr-only">Saved with every review decision</span>
           </div>
         </header>
+        {seeding && (
+          <div className="seed-banner" role="status">
+            <span className="spin" aria-hidden="true" />
+            Setting up a lived-in demo portfolio: three fictional deals, their audits, plans and reviews, and a
+            prospect pipeline. Synthetic data only.
+          </div>
+        )}
         <main id="main" tabIndex={-1}>{children}</main>
       </div>
     </div>

@@ -25,6 +25,7 @@ def shot(page, name, full=False):
 with sync_playwright() as p:
     browser = p.chromium.launch()
     ctx = browser.new_context(viewport={"width": 1440, "height": 900}, device_scale_factor=1, accept_downloads=True)
+    ctx.add_init_script("try { localStorage.setItem('mp.demoSeed', 'off'); } catch (e) {}")  # these tests start from an empty workspace
     page = ctx.new_page()
     # The deliberate invalid-upload check below returns HTTP 400; browsers log that as a console error.
     page.on("console", lambda m: m.type in ("error", "warning") and "status of 400" not in m.text
@@ -136,6 +137,7 @@ with sync_playwright() as p:
 
     # mobile
     m = browser.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True)
+    m.add_init_script("try { localStorage.setItem('mp.demoSeed', 'off'); } catch (e) {}")  # these tests start from an empty workspace
     mp = m.new_page()
     mp.on("pageerror", lambda e: errors.append(f"mobile pageerror: {e}"))
     mp.goto(BASE + "/")

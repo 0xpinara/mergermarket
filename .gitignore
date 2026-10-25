@@ -16,6 +16,7 @@ frontend/dist/
 .vscode/
 .idea/
 smoke-shots/
+# Local secrets — never commit
 .env
 .env.*
 *.env
@@ -23,3 +24,5 @@ credentials.json
 *.pem
 *.key
 .credentials
+# Demo-video build output
+demo-build/
