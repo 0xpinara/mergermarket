@@ -8,6 +8,8 @@ import { money, num, pct, plural } from "../lib/format";
 import { AsciiBar, DealStateChip, ErrorBox, Info, Kicker, Loading, SevChip, useCountUp } from "../components/ui";
 import { IllustrativeSkyline, Skyline } from "../components/Skyline";
 import { RunAudit } from "../components/RunAudit";
+import { AsciiScene } from "../components/AsciiScene";
+import { dusk } from "../art/dusk";
 import { DealForm } from "../components/DealForm";
 import { useSampleLoader } from "../components/Shell";
 
@@ -283,72 +285,72 @@ export function CommandCenter() {
   return (
     <div className="page">
       {(dealQ.error || sumQ.error) && <ErrorBox error={dealQ.error || sumQ.error} onRetry={() => { dealQ.refetch(); sumQ.refetch(); }} />}
-      <section className="hero on-ink">
-        <div className="hero-inner">
-          <div>
-            {deal && (
-              <div className="hero-deal">
-                <span className="dot" aria-hidden="true" /> {deal.title}
-                {deal.is_sample && <span style={{ color: "var(--ink-400)" }}>· synthetic</span>}
-              </div>
-            )}
-            <Kicker sec="01">Command Center</Kicker>
-            <h1>
-              Did every lease <em>survive</em> the move?
-            </h1>
-            <p className="lede">
-              {hasRun && s?.labels
-                ? `${s.labels.old} vs ${s.labels.new}: ${num(s.totals?.active_leases)} active leases (${money(s.totals?.active_rent)}/mo) checked record by record. Here is what the evidence shows.`
-                : "After an acquisition, MergeProof proves which tenants, leases, deposits and work orders survived the move into your main system — and shows exactly what went missing or changed, down to the source row."}
-            </p>
-            <div className="btn-row">
-              {noDeal || !hasRun ? (
-                <>
-                  {noDeal || !deal?.is_sample ? (
-                    <button className="btn primary lg" onClick={() => sample.mutate(false)} disabled={sample.isPending}>
-                      <Sparkles /> {sample.isPending ? "Loading sample…" : "Try sample acquisition"}
-                    </button>
-                  ) : (
-                    <Link className="btn primary lg" to={`/deals/${deal.id}/workspace`}>
-                      <FileCheck2 /> Review exports &amp; run audit
-                    </Link>
-                  )}
-                  <button className="btn ghost lg" onClick={() => setCreating(true)}>
-                    <Upload /> Start audit with my files
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link className="btn primary lg" to={`/deals/${deal!.id}/findings`}>
-                    Review findings <ArrowRight />
-                  </Link>
-                  <Link className="btn ghost lg" to={`/deals/${deal!.id}/proof`}>
-                    <FileCheck2 /> Continuity proof
-                  </Link>
-                </>
-              )}
+      <section className="hero on-ink scene-hero">
+        <AsciiScene scene={dusk} className="hero-art" />
+        <div className="hero-veil" aria-hidden="true" />
+        <div className="hero-copy">
+          {deal && (
+            <div className="hero-deal">
+              <span className="dot" aria-hidden="true" /> {deal.title}
+              {deal.is_sample && <span style={{ color: "var(--ink-400)" }}>· synthetic</span>}
             </div>
-            {hasRun && s ? <ScoreGauge s={s} /> : (
-              <p className="fine">No account, card or real data needed · fictional Cedar × Bayview portfolio · 186 units</p>
-            )}
-          </div>
-          <div>
-            {hasRun && mapQ.data ? (
+          )}
+          <Kicker sec="01">Command Center</Kicker>
+          <h1>
+            Did every lease <em>survive</em> the move?
+          </h1>
+          <p className="lede">
+            {hasRun && s?.labels
+              ? `${s.labels.old} vs ${s.labels.new}: ${num(s.totals?.active_leases)} active leases (${money(s.totals?.active_rent)}/mo) checked record by record. Here is what the evidence shows.`
+              : "After an acquisition, MergeProof proves which tenants, leases, deposits and work orders survived the move into your main system — and shows exactly what went missing or changed, down to the source row."}
+          </p>
+          <div className="btn-row">
+            {noDeal || !hasRun ? (
               <>
-                <Skyline properties={mapQ.data.properties} lit onPick={(id) => nav(`/deals/${dealId}/findings?f=${id}`)} />
-                <div className="skyline-caption">
-                  Each window is a unit in {s?.labels?.old_short}'s legacy export · click a flagged window for evidence
-                </div>
+                {noDeal || !deal?.is_sample ? (
+                  <button className="btn primary lg" onClick={() => sample.mutate(false)} disabled={sample.isPending}>
+                    <Sparkles /> {sample.isPending ? "Loading sample…" : "Try sample acquisition"}
+                  </button>
+                ) : (
+                  <Link className="btn primary lg" to={`/deals/${deal.id}/workspace`}>
+                    <FileCheck2 /> Review exports &amp; run audit
+                  </Link>
+                )}
+                <button className="btn ghost lg" onClick={() => setCreating(true)}>
+                  <Upload /> Start audit with my files
+                </button>
               </>
             ) : (
               <>
-                <IllustrativeSkyline />
-                <div className="skyline-caption">
-                  Illustrative · after an audit every window is a real unit, coloured by what the evidence shows
-                </div>
+                <Link className="btn primary lg" to={`/deals/${deal!.id}/findings`}>
+                  Review findings <ArrowRight />
+                </Link>
+                <Link className="btn ghost lg" to={`/deals/${deal!.id}/proof`}>
+                  <FileCheck2 /> Continuity proof
+                </Link>
               </>
             )}
           </div>
+          {hasRun && s ? <ScoreGauge s={s} /> : (
+            <p className="fine">No account, card or real data needed · fictional Cedar × Bayview portfolio · 186 units</p>
+          )}
+        </div>
+        <div className="hero-city">
+          {hasRun && mapQ.data ? (
+            <>
+              <Skyline properties={mapQ.data.properties} lit solid onPick={(id) => nav(`/deals/${dealId}/findings?f=${id}`)} />
+              <div className="skyline-caption">
+                Each window is a unit in {s?.labels?.old_short}'s legacy export · click a flagged window for evidence
+              </div>
+            </>
+          ) : (
+            <>
+              <IllustrativeSkyline solid />
+              <div className="skyline-caption">
+                Illustrative · after an audit every window is a real unit, coloured by what the evidence shows
+              </div>
+            </>
+          )}
         </div>
       </section>
 

@@ -29,13 +29,15 @@ interface Props {
   lit?: boolean;
   onPick?: (findingId: string) => void;
   pending?: boolean;
+  solid?: boolean; // opaque building bodies, for standing in front of the ASCII painting
 }
 
-export function Skyline({ properties, variant = "ink", lit = false, onPick, pending = false }: Props) {
+export function Skyline({ properties, variant = "ink", lit = false, onPick, pending = false, solid = false }: Props) {
   let order = 0;
   return (
     <div className="skyline-wrap">
-      <div className={`skyline ${variant}${lit ? " lit" : ""}`} role="group" aria-label="Unit-level verification map">
+      <div className={`skyline ${variant}${lit ? " lit" : ""}${solid ? " solid" : ""}`} role="group"
+           aria-label="Unit-level verification map">
         {properties.map((p, pi) => {
           const floors = new Map<number, UnitCell[]>();
           for (const u of p.units) {
@@ -49,8 +51,8 @@ export function Skyline({ properties, variant = "ink", lit = false, onPick, pend
           const problems = p.units.filter((u) => ["critical", "issue", "review"].includes(u.state)).length;
           return (
             <div className="bldg" key={p.key}>
-              <pre aria-hidden="true">{shape.acc || " "}</pre>
-              <pre aria-hidden="true">{shape.roof}</pre>
+              <pre className="acc" aria-hidden="true">{shape.acc || " "}</pre>
+              <pre className="roof" aria-hidden="true">{shape.roof}</pre>
               <div className="floors">
                 {levels.map((lv) => {
                   const cells = (floors.get(lv) ?? []).slice().sort((a, b) => (a.norm ?? a.label).localeCompare(b.norm ?? b.label));
@@ -107,7 +109,7 @@ export function Skyline({ properties, variant = "ink", lit = false, onPick, pend
 }
 
 /** Decorative portfolio for the empty state — clearly labelled as illustrative. */
-export function IllustrativeSkyline() {
+export function IllustrativeSkyline({ solid = false }: { solid?: boolean }) {
   const seed = [5, 4, 6, 3, 5, 4];
   const states: UnitCell["state"][] = ["verified", "verified", "verified", "vacant", "verified", "issue", "verified",
     "critical", "verified", "verified", "review", "verified"];
@@ -126,5 +128,5 @@ export function IllustrativeSkyline() {
       };
     }),
   }));
-  return <Skyline properties={properties} variant="ink" lit />;
+  return <Skyline properties={properties} variant="ink" lit solid={solid} />;
 }

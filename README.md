@@ -248,6 +248,7 @@ backend/app/
   sample_data/   synthetic Cedar × Bayview exports
 backend/tests/   fixture, matching, ingest, normalizer and API tests
 frontend/src/    React + TypeScript; hand-built design system in styles.css
+  art/dusk.ts    the hero's animated ASCII scene (halftone dots, ordered dither, palette-quantized; canvas)
 backend/eval/    ground-truth evaluation harness + latest results.json
 scripts/         browser smoke test
 ```

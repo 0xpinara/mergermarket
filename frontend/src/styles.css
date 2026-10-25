@@ -3379,3 +3379,93 @@ hr.dash {
   color: var(--muted);
   margin-top: 4px;
 }
+
+/* --------------------------------------------------------------------- the ASCII dusk hero */
+
+.scene-hero {
+  display: flex;
+  flex-direction: column;
+  min-height: 640px;
+  background: #070b14;
+}
+.scene-hero::before {
+  display: none;
+}
+.hero-art {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+}
+.hero-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(7, 11, 20, 0.84) 0%, rgba(7, 11, 20, 0.6) 34%, rgba(7, 11, 20, 0) 60%);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 62%, transparent 82%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 62%, transparent 82%);
+}
+.hero-copy {
+  position: relative;
+  max-width: 640px;
+  padding: 36px 36px 8px;
+}
+.hero-copy .lede {
+  color: var(--ink-200);
+}
+.hero-copy .score {
+  border-top-color: rgba(149, 161, 184, 0.35);
+}
+.hero-city {
+  position: relative;
+  margin-top: auto;
+  padding: 10px 24px 16px;
+  container-type: inline-size;
+}
+.hero-city .skyline {
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+.hero-city .skyline .bldg pre,
+.hero-city .skyline .bldg .floors {
+  font-size: clamp(7px, calc((100cqw - 80px) / 72), 12.5px);
+}
+.hero-city .skyline .bldg .name {
+  font-size: clamp(8px, 0.8cqw, 10px);
+}
+.skyline.solid .bldg pre.roof,
+.skyline.solid .bldg .floors,
+.skyline.solid .bldg pre.ground {
+  background: #070b14;
+}
+.skyline.solid .bldg .name,
+.hero-city .legend,
+.hero-city .skyline-caption {
+  text-shadow: 0 0 6px #070b14, 0 0 2px #070b14;
+}
+
+@media (max-width: 720px) {
+  .scene-hero {
+    min-height: 0;
+  }
+  .hero-copy {
+    padding: 24px 20px 8px;
+  }
+  .hero-veil {
+    background: linear-gradient(180deg, rgba(7, 11, 20, 0.78) 0%, rgba(7, 11, 20, 0.62) 70%, rgba(7, 11, 20, 0.4) 100%);
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .hero-city {
+    margin-top: 28px;
+    padding: 18px 12px 14px;
+    background: linear-gradient(180deg, rgba(7, 11, 20, 0) 0, #070b14 48px);
+  }
+  .hero-city .skyline {
+    flex-wrap: wrap;
+  }
+  .hero-city .skyline .bldg pre,
+  .hero-city .skyline .bldg .floors {
+    font-size: 10px;
+  }
+}
